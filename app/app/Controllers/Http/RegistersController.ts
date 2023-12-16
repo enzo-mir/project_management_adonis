@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import AuthValidator from 'App/Validators/AuthValidator'
+import User from 'App/Models/User'
+import RegisterValidator from 'App/Validators/AuthValidator'
 
 export default class RegistersController {
   public async index(ctx: HttpContextContract) {
@@ -8,8 +9,9 @@ export default class RegistersController {
 
   public async register(ctx: HttpContextContract) {
     try {
-      await ctx.request.validate(AuthValidator)
-      return ctx.inertia.render('Register', { errors: { message: '' } })
+      const data = await ctx.request.validate(RegisterValidator)
+      await User.create(data)
+      return ctx.inertia.location('/login')
     } catch (error) {
       return ctx.inertia.render('Register', { errors: error })
     }
