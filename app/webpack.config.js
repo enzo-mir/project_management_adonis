@@ -1,51 +1,16 @@
-const { join } = require('path')
-const Encore = require('@symfony/webpack-encore')
+const { join } = require("path");
+const Encore = require("@symfony/webpack-encore");
 
-/*
-|--------------------------------------------------------------------------
-| Encore runtime environment
-|--------------------------------------------------------------------------
-*/
 if (!Encore.isRuntimeEnvironmentConfigured()) {
-  Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev')
+  Encore.configureRuntimeEnvironment(process.env.NODE_ENV || "dev");
 }
 
-/*
-|--------------------------------------------------------------------------
-| Output path
-|--------------------------------------------------------------------------
-|
-| The output path for writing the compiled files. It should always
-| be inside the public directory, so that AdonisJS can serve it.
-|
-*/
-Encore.setOutputPath('./public/assets')
+Encore.setOutputPath("./public/assets");
+Encore.setPublicPath("/assets");
 
-/*
-|--------------------------------------------------------------------------
-| Public URI
-|--------------------------------------------------------------------------
-|
-| The public URI to access the static files. It should always be
-| relative from the "public" directory.
-|
-*/
-Encore.setPublicPath('/assets')
-
-/*
-|--------------------------------------------------------------------------
-| Entrypoints
-|--------------------------------------------------------------------------
-|
-| Entrypoints are script files that boots your frontend application. Ideally
-| a single entrypoint is used by majority of applications. However, feel
-| free to add more (if required).
-|
-| Also, make sure to read the docs on "Assets bundler" to learn more about
-| entrypoints.
-|
-*/
-Encore.addEntry('app', './resources/js/app.js')
+Encore.addEntry("app", "./resources/js/app.tsx");
+Encore.enableTypeScriptLoader();
+Encore.enableReactPreset();
 
 /*
 |--------------------------------------------------------------------------
@@ -84,7 +49,7 @@ Encore.addEntry('app', './resources/js/app.js')
 | Treat each entry point and its dependencies as its own isolated module.
 |
 */
-Encore.disableSingleRuntimeChunk()
+Encore.disableSingleRuntimeChunk();
 
 /*
 |--------------------------------------------------------------------------
@@ -95,7 +60,7 @@ Encore.disableSingleRuntimeChunk()
 | will ensure that all unused files from the previous build are removed.
 |
 */
-Encore.cleanupOutputBeforeBuild()
+Encore.cleanupOutputBeforeBuild();
 
 /*
 |--------------------------------------------------------------------------
@@ -105,7 +70,7 @@ Encore.cleanupOutputBeforeBuild()
 | Enable source maps in production
 |
 */
-Encore.enableSourceMaps(!Encore.isProduction())
+Encore.enableSourceMaps(!Encore.isProduction());
 
 /*
 |--------------------------------------------------------------------------
@@ -115,7 +80,7 @@ Encore.enableSourceMaps(!Encore.isProduction())
 | Enable assets versioning to leverage lifetime browser and CDN cache
 |
 */
-Encore.enableVersioning(Encore.isProduction())
+Encore.enableVersioning(Encore.isProduction());
 
 /*
 |--------------------------------------------------------------------------
@@ -132,20 +97,20 @@ Encore.configureDevServerOptions((options) => {
    * Normalize "options.static" property to an array
    */
   if (!options.static) {
-    options.static = []
+    options.static = [];
   } else if (!Array.isArray(options.static)) {
-    options.static = [options.static]
+    options.static = [options.static];
   }
 
   /**
    * Enable live reload and add views directory
    */
-  options.liveReload = true
+  options.liveReload = true;
   options.static.push({
-    directory: join(__dirname, './resources/views'),
+    directory: join(__dirname, "./resources/views"),
     watch: true,
-  })
-})
+  });
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -197,11 +162,11 @@ Encore.configureDevServerOptions((options) => {
 | the level to "info".
 |
 */
-const config = Encore.getWebpackConfig()
+const config = Encore.getWebpackConfig();
 config.infrastructureLogging = {
-  level: 'warn',
-}
-config.stats = 'errors-warnings'
+  level: "warn",
+};
+config.stats = "errors-warnings";
 
 /*
 |--------------------------------------------------------------------------
@@ -211,4 +176,4 @@ config.stats = 'errors-warnings'
 | Export config for webpack to do its job
 |
 */
-module.exports = config
+module.exports = config;
