@@ -10,6 +10,4 @@ Route.get('/logout', async (ctx) => {
   await ctx.auth.logout()
   return ctx.inertia.location('/')
 })
-Route.get('/dashboard', async (ctx) =>
-  ctx.inertia.render('Dashboard', { errors: { messages: '' } })
-).middleware('auth')
+Route.get('/dashboard', 'AdminsController.dashboard').middleware('auth')
