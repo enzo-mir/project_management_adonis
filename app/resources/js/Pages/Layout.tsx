@@ -17,6 +17,16 @@ const LayoutWrapper = styled.section`
     align-self: start;
     width: clamp(400px, 50svw, 700px);
   }
+
+  & a {
+  position: relative;
+  background: linear-gradient(45deg, hsl(242, 51%, 38%), hsl(243, 100%, 74%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+}
+
 `
 
 const Layout = ({ children }) => {
