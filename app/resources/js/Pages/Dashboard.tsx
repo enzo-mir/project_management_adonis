@@ -13,7 +13,7 @@ const ProjectMenus = styled.nav`
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 5%;
-  background-color: #534aff;
+  background-color: rgba(83, 74, 255, 0.2);
   height: 100%;
   overflow: hidden;
   padding: 2em;
