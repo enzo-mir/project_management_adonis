@@ -10,4 +10,7 @@ Route.get('/logout', async (ctx) => {
   await ctx.auth.logout()
   return ctx.inertia.location('/')
 })
+Route.group(() => {
+  Route.post('/add', 'ProjectsManagmentsController.add')
+}).prefix('/project')
 Route.get('/dashboard', 'AdminsController.dashboard').middleware('auth')

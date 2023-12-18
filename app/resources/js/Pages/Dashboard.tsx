@@ -1,11 +1,16 @@
 import { userdataType } from '../types/userdatatype'
-import { useRef, useState } from 'react'
+import React, { FormEvent, useRef, useState } from 'react'
 // @ts-ignore: Unreachable code error
 import bgImage from '../images/backgroundImage.png'
 import { ProjectMenus, Wrapper } from '../styles/DashboardStyle'
 import TasksContainer from '../components/TasksContainer'
 import { TasksType, projectsType } from 'App/types/adminDataTypes'
 import HeaderDashboard from '../components/HeaderDashboard'
+// @ts-ignore: Unreachable code error
+import burgerIcon from '../images/burger.svg'
+// @ts-ignore: Unreachable code error
+import createProjectIcon from '../images/createProjectIcon.svg'
+import { useForm } from '@inertiajs/inertia-react'
 
 const Dashboard = ({
   errors,
@@ -17,11 +22,19 @@ const Dashboard = ({
   const projectNavRef = useRef<HTMLElement>(null)
   console.log(errors)
 
+  const { data, setData, processing, post } = useForm({
+    nameValue: '',
+    descValue: '',
+    startDateValue: null,
+    endDateValue: null,
+    priorityValue: 0,
+  })
+
   const [currentProject, setCurrentProject] = useState<projectsType[0]>(
     userData.projects.sort(sortByPriority)[0]
   )
   const [currentTasks, setCurrentTasks] = useState<TasksType>(getTasks(currentProject))
-
+  const [addingProject, setAddingProject] = useState<boolean>(false)
   function sortByPriority(a: { priority: number }, b: { priority: number }) {
     return a.priority > b.priority ? -1 : 1
   }
@@ -45,42 +58,91 @@ const Dashboard = ({
     return filterTasks
   }
 
+  function addProject(e: FormEvent) {
+    e.preventDefault()
+    post('/project/add', { data })
+  }
+
+  function handleChangeValues(e: React.ChangeEvent) {
+    ;(e.target as HTMLInputElement).name === 'priorityValue'
+      ? setData({
+          ...data,
+          [(e.target as HTMLInputElement).name]: parseInt((e.target as HTMLInputElement).value),
+        })
+      : setData({
+          ...data,
+          [(e.target as HTMLInputElement).name]: (e.target as HTMLInputElement).value,
+        })
+  }
+
   return (
     <Wrapper>
       <img src={bgImage} alt="" />
       <ProjectMenus ref={projectNavRef} className="display">
         <button onClick={handleToggleProjectMenus}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="34"
-            height="29"
-            viewBox="0 0 34 29"
-            fill="none"
-          >
-            <path
-              d="M1 1H33"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M1 14.2874H33"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M1 27.5749H33"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <img src={burgerIcon} alt="" />
         </button>
         <ul>
+          {addingProject && (
+            <li className="adding">
+              <form onSubmit={addProject}>
+                <label htmlFor="nameValue">
+                  Name :
+                  <input
+                    type="text"
+                    name="nameValue"
+                    id="nameValue"
+                    onChange={handleChangeValues}
+                    required
+                  />
+                </label>
+                <label htmlFor="descValue">
+                  Description :
+                  <input
+                    type="text"
+                    name="descValue"
+                    id="descValue"
+                    onChange={handleChangeValues}
+                    required
+                  />
+                </label>
+                <label htmlFor="startDateValue">
+                  Start date :
+                  <input
+                    type="date"
+                    name="startDateValue"
+                    id="startDateValue"
+                    onChange={handleChangeValues}
+                    required
+                  />
+                </label>
+                <label htmlFor="endDateValue">
+                  End date :
+                  <input
+                    type="date"
+                    name="endDateValue"
+                    id="endDateValue"
+                    onChange={handleChangeValues}
+                    required
+                  />
+                </label>
+                <label htmlFor="priorityValue">
+                  priority :{' '}
+                  <select
+                    name="priorityValue"
+                    id="priorityValue"
+                    onChange={handleChangeValues}
+                    required
+                  >
+                    <option value={0}>Low</option>
+                    <option value={1}>Mid</option>
+                    <option value={2}>Hight</option>
+                  </select>
+                </label>
+                <input type="submit" value="Add project" disabled={processing} />
+              </form>
+            </li>
+          )}
           {userData.projects.sort(sortByPriority).map((projects, index) => {
             const status = projects.status === 0 ? 'todo' : projects.status === 1 ? 'doing' : 'done'
             return (
@@ -118,41 +180,19 @@ const Dashboard = ({
             )
           })}
         </ul>
-        <button onClick={handleToggleProjectMenus}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="40"
-            height="41"
-            viewBox="0 0 40 41"
-            fill="none"
-          >
-            <path
-              d="M20.1617 2.36835L20.1143 38.535"
-              stroke="white"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M2 20.4517H38.1667"
-              stroke="white"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+        <button onClick={() => setAddingProject(true)}>
+          <img src={createProjectIcon} alt="" />
         </button>
       </ProjectMenus>
-      {currentTasks && (
-        <TasksContainer tasks={currentTasks}>
-          {currentProject && (
-            <HeaderDashboard
-              projectTitle={currentProject.name}
-              projectDescription={currentProject.description}
-            />
-          )}
-        </TasksContainer>
-      )}
+
+      <TasksContainer tasks={currentTasks}>
+        {currentProject && (
+          <HeaderDashboard
+            projectTitle={currentProject.name}
+            projectDescription={currentProject.description}
+          />
+        )}
+      </TasksContainer>
     </Wrapper>
   )
 }

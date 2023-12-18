@@ -15,6 +15,7 @@ const Wrapper = styled.main`
     height: 100%;
     z-index: -1;
     filter: brightness(50%);
+    object-fit: cover;
   }
 `
 const ProjectMenus = styled.nav`
@@ -98,6 +99,37 @@ const ProjectMenus = styled.nav`
       &:hover {
         cursor: pointer;
         background-color: rgba(125, 119, 244, 0.5);
+      }
+
+      &.adding {
+        padding-block: 1em;
+        & > form {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5em;
+          & input {
+            background: hsl(242, 50%, 40%);
+            color: white;
+            border: 1px solid black;
+            padding: 0.5em;
+            border-radius: 3px;
+
+            &[type='submit'] {
+              width: fit-content;
+              border: none;
+              &:hover {
+                cursor: pointer;
+              }
+            }
+          }
+          & > label {
+            display: flex;
+            gap: 0.5em;
+          }
+        }
+        &:hover {
+          cursor: initial;
+        }
       }
     }
   }

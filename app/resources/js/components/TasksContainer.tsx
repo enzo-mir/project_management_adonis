@@ -4,12 +4,27 @@ import styled from 'styled-components'
 
 const WrapperTasks = styled.section`
   position: relative;
-  padding-inline: 10%;
+  padding: 2em 10%;
   display: grid;
   grid-template-rows: auto auto 1fr;
   gap: 2em;
   place-items: center;
   color: white;
+
+  & > div.rangeProgressContainer {
+    width: 75%;
+    & > label {
+      display: flex;
+      gap: 1em;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+
+      & > input[type='range'] {
+        width: 100%;
+      }
+    }
+  }
   & > ol#tasksCont {
     display: flex;
     gap: 2em;
@@ -94,10 +109,10 @@ const WrapperTasks = styled.section`
 
 const TasksContainer = ({ tasks, children }: { tasks: TasksType; children: ReactNode }) => {
   const [progression, setProgression] = useState<number>(0 || getProgression(tasks))
-  const [dinamicTasks, setDinamicTasks] = useState<TasksType>()
+  const [dinamicTasks, setDinamicTasks] = useState<TasksType>(tasks)
   useEffect(() => {
     setDinamicTasks(tasks)
-    setProgression(getProgression(dinamicTasks || tasks))
+    setProgression(getProgression(tasks))
   }, [tasks])
 
   function getProgression(tasks: TasksType) {
@@ -146,7 +161,7 @@ const TasksContainer = ({ tasks, children }: { tasks: TasksType; children: React
       {children}
       <div className="rangeProgressContainer">
         <label htmlFor="progressBar">
-          ProgressBar
+          Progression
           <input
             type="range"
             name="progressBar"
@@ -155,6 +170,7 @@ const TasksContainer = ({ tasks, children }: { tasks: TasksType; children: React
             min={0}
             max={100}
             step={1}
+            title={progression.toString()}
             disabled
           />
         </label>
