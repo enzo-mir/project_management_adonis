@@ -4,6 +4,8 @@ import Task from 'App/Models/Task'
 import { TasksType, projectsType } from 'App/types/adminDataTypes'
 
 export default class AdminsController {
+  private tableOfProjects: projectsType = []
+  private tableOfTasks: TasksType = []
   private async getUserData(ctx: HttpContextContract) {
     try {
       const userId = ctx.auth.user?.id
@@ -16,20 +18,21 @@ export default class AdminsController {
 
   public async dashboard(ctx: HttpContextContract) {
     const userDataProjects: Project[] = await this.getUserData(ctx)
-    const tableOfProjects: projectsType = []
-    const tableOfTasks: TasksType = []
+
     userDataProjects.map(async (projects) => {
-      let task = await Task.query().select('*').where('project_id', projects.id)
-      tableOfTasks.push({
-        id: task[0].id,
-        project_id: task[0].project_id,
-        name: task[0].name,
-        description: task[0].description,
-        status: task[0].status,
-        priority: task[0].priority,
+      let tasks = await Task.query().where('project_id', projects.id)
+      tasks.map((task) => {
+        this.tableOfTasks.push({
+          id: task.id,
+          project_id: task.project_id,
+          name: task.name,
+          description: task.description,
+          status: task.status,
+          priority: task.priority,
+        })
       })
 
-      tableOfProjects.push({
+      this.tableOfProjects.push({
         id: projects.id,
         name: projects.name,
         description: projects.description,
@@ -39,12 +42,15 @@ export default class AdminsController {
         priority: projects.priority,
       })
     })
+    setTimeout(() => {
+      console.log(this.tableOfTasks)
+    }, 500)
 
     return ctx.inertia.render('Dashboard', {
       errors: { messages: (userDataProjects as unknown as { error: string }).error || '' },
       userData: {
-        projects: tableOfProjects,
-        tasks: tableOfTasks,
+        projects: this.tableOfProjects,
+        tasks: this.tableOfTasks,
       },
     })
   }

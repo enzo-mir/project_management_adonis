@@ -1,96 +1,11 @@
-import styled from 'styled-components'
 import { userdataType } from '../types/userdatatype'
-import { useRef } from 'react'
-
-const Wrapper = styled.main`
-  position: relative;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  width: 100%;
-  height: 100%;
-`
-const ProjectMenus = styled.nav`
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 5%;
-  background-color: rgba(83, 74, 255, 0.2);
-  height: 100%;
-  overflow: hidden;
-  padding: 2em;
-
-  & button {
-    width: 34px;
-    height: 29px;
-    background-color: transparent;
-    border: none;
-
-    &:last-child {
-      width: 40px;
-      height: 41px;
-    }
-    &:hover {
-      cursor: pointer;
-    }
-  }
-
-  & ul {
-    display: flex;
-    flex-direction: column;
-    gap: 2em;
-    width: 0px;
-    color: white;
-    max-height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    transition: all 0.5s ease-out;
-
-    & > li {
-      display: flex;
-      flex-direction: column;
-      padding-block-start: 0.5em;
-      gap: 0.5em;
-      border-radius: 5px;
-      & > h2 {
-        font-weight: 400;
-      }
-
-      & > *:not(div) {
-        padding-inline-start: 10px;
-        width: 100%;
-      }
-      & > div {
-        padding: 0.5em 10px;
-        font-size: 0.75em;
-
-        &.projectTodo {
-          background-color: hsl(242, 50%, 20%);
-        }
-        &.projectDoing {
-          background-color: #3389ef;
-        }
-        &.projectDone {
-          background-color: #6eda5c;
-        }
-      }
-
-      &.active {
-        background-color: #7e77f4;
-      }
-
-      &:hover {
-        cursor: pointer;
-      }
-    }
-  }
-
-  &.display {
-    width: 100%;
-
-    & ul {
-      width: clamp(250px, 20vw, 350px);
-    }
-  }
-`
+import { useRef, useState } from 'react'
+// @ts-ignore: Unreachable code error
+import bgImage from '../images/backgroundImage.png'
+import { ProjectMenus, Wrapper } from '../styles/DashboardStyle'
+import TasksContainer from '../components/TasksContainer'
+import { TasksType, projectsType } from 'App/types/adminDataTypes'
+import HeaderDashboard from '../components/HeaderDashboard'
 
 const Dashboard = ({
   errors,
@@ -100,10 +15,14 @@ const Dashboard = ({
   userData: userdataType
 }) => {
   const projectNavRef = useRef<HTMLElement>(null)
-
   console.log(errors)
 
-  function sortByPriority(a, b) {
+  const [currentProject, setCurrentProject] = useState<projectsType[0]>(
+    userData.projects.sort(sortByPriority)[0]
+  )
+  const [currentTasks, setCurrentTasks] = useState<TasksType>(getTasks(currentProject))
+
+  function sortByPriority(a: { priority: number }, b: { priority: number }) {
     return a.priority > b.priority ? -1 : 1
   }
 
@@ -111,8 +30,24 @@ const Dashboard = ({
     projectNavRef.current?.classList.toggle('display')
   }
 
+  function projectToDisplay(e: EventTarget, projects: projectsType[0]) {
+    document.querySelector('.activeProject')?.classList.remove('activeProject')
+    ;(e as HTMLElement).classList.add('activeProject')
+
+    setCurrentProject(projects)
+    setCurrentTasks(getTasks(projects))
+  }
+
+  function getTasks(projects: projectsType[0]) {
+    const filterTasks = userData.tasks.filter((task) => {
+      return task.project_id === projects.id ? true : false
+    })
+    return filterTasks
+  }
+
   return (
     <Wrapper>
+      <img src={bgImage} alt="" />
       <ProjectMenus ref={projectNavRef} className="display">
         <button onClick={handleToggleProjectMenus}>
           <svg
@@ -125,43 +60,63 @@ const Dashboard = ({
             <path
               d="M1 1H33"
               stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M1 14.2874H33"
               stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M1 27.5749H33"
               stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </button>
         <ul>
-          {userData.projects
-            .sort(sortByPriority)
-            .map((projects, id) => {
-              const status =
-                projects.status === 0 ? 'todo' : projects.status === 1 ? 'doing' : 'done'
-              return (
-                <li key={projects.id} className={id === 0 ? ' active' : ''}>
-                  <h2>{projects.name}</h2>
-                  <p>{projects.description}</p>
-                  <div className={`project${status[0].toUpperCase() + status.substring(1)}`}>
-                    <p>{status}</p>
-                  </div>
-                </li>
-              )
-            })
-            .sort(sortByPriority)}
+          {userData.projects.sort(sortByPriority).map((projects, index) => {
+            const status = projects.status === 0 ? 'todo' : projects.status === 1 ? 'doing' : 'done'
+            return (
+              <li
+                key={projects.id}
+                className={index === 0 ? 'activeProject' : ''}
+                onClick={(e) => projectToDisplay(e.target, projects)}
+              >
+                <h2
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                  }}
+                >
+                  {projects.name}
+                </h2>
+                <p
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                  }}
+                >
+                  {projects.description}
+                </p>
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                  }}
+                  className={`project${status[0].toUpperCase() + status.substring(1)}`}
+                >
+                  <p>{status}</p>
+                </div>
+              </li>
+            )
+          })}
         </ul>
         <button onClick={handleToggleProjectMenus}>
           <svg
@@ -174,20 +129,30 @@ const Dashboard = ({
             <path
               d="M20.1617 2.36835L20.1143 38.535"
               stroke="white"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M2 20.4517H38.1667"
               stroke="white"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </button>
       </ProjectMenus>
+      {currentTasks && (
+        <TasksContainer tasks={currentTasks}>
+          {currentProject && (
+            <HeaderDashboard
+              projectTitle={currentProject.name}
+              projectDescription={currentProject.description}
+            />
+          )}
+        </TasksContainer>
+      )}
     </Wrapper>
   )
 }

@@ -1,4 +1,6 @@
 {
   "assets/app.css": "http://localhost:8080/assets/app.css",
-  "assets/app.js": "http://localhost:8080/assets/app.js"
+  "assets/app.js": "http://localhost:8080/assets/app.js",
+  "assets/app.png": "http://localhost:8080/assets/images/backgroundImage.557c3773.png",
+  "assets/images/backgroundImage.png": "http://localhost:8080/assets/images/backgroundImage.557c3773.png"
 }
