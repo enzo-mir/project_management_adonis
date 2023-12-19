@@ -6,7 +6,7 @@ export default class ProjectsManagmentsController {
   public async add(ctx: HttpContextContract) {
     try {
       const projectData = await ctx.request.validate(AddProjectValidator)
-      Project.create({
+      await Project.create({
         user_id: ctx.auth.user?.id,
         name: projectData.nameValue,
         description: projectData.descValue,

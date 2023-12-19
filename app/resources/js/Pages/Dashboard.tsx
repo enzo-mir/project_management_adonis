@@ -1,5 +1,5 @@
 import { userdataType } from '../types/userdatatype'
-import React, { FormEvent, useRef, useState } from 'react'
+import React, { FormEvent,  useRef, useState } from 'react'
 // @ts-ignore: Unreachable code error
 import bgImage from '../images/backgroundImage.png'
 import { ProjectMenus, Wrapper } from '../styles/DashboardStyle'
@@ -11,6 +11,7 @@ import burgerIcon from '../images/burger.svg'
 // @ts-ignore: Unreachable code error
 import createProjectIcon from '../images/createProjectIcon.svg'
 import { useForm } from '@inertiajs/inertia-react'
+import { projectStore } from '../store/project.store'
 
 const Dashboard = ({
   errors,
@@ -33,8 +34,11 @@ const Dashboard = ({
   const [currentProject, setCurrentProject] = useState<projectsType[0]>(
     userData.projects.sort(sortByPriority)[0]
   )
+  const [allProjects] = projectStore((state) => [state.allProjects])
+
   const [currentTasks, setCurrentTasks] = useState<TasksType>(getTasks(currentProject))
   const [addingProject, setAddingProject] = useState<boolean>(false)
+
   function sortByPriority(a: { priority: number }, b: { priority: number }) {
     return a.priority > b.priority ? -1 : 1
   }
@@ -143,49 +147,53 @@ const Dashboard = ({
               </form>
             </li>
           )}
-          {userData.projects.sort(sortByPriority).map((projects, index) => {
-            const status = projects.status === 0 ? 'todo' : projects.status === 1 ? 'doing' : 'done'
-            return (
-              <li
-                key={projects.id}
-                className={index === 0 ? 'activeProject' : ''}
-                onClick={(e) => projectToDisplay(e.target, projects)}
-              >
-                <h2
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    projectToDisplay((e.target as HTMLElement).parentNode!, projects)
-                  }}
+          {((allProjects.length && allProjects) || userData.projects)
+            .sort(sortByPriority)
+            .map((projects, index) => {
+              const status =
+                projects.status === 0 ? 'todo' : projects.status === 1 ? 'doing' : 'done'
+
+              return (
+                <li
+                  key={projects.id}
+                  className={index === 0 ? 'activeProject' : ''}
+                  onClick={(e) => projectToDisplay(e.target, projects)}
                 >
-                  {projects.name}
-                </h2>
-                <p
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    projectToDisplay((e.target as HTMLElement).parentNode!, projects)
-                  }}
-                >
-                  {projects.description}
-                </p>
-                <div
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    projectToDisplay((e.target as HTMLElement).parentNode!, projects)
-                  }}
-                  className={`project${status[0].toUpperCase() + status.substring(1)}`}
-                >
-                  <p>{status}</p>
-                </div>
-              </li>
-            )
-          })}
+                  <h2
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                    }}
+                  >
+                    {projects.name}
+                  </h2>
+                  <p
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                    }}
+                  >
+                    {projects.description}
+                  </p>
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                    }}
+                    className={`project${status[0].toUpperCase() + status.substring(1)}`}
+                  >
+                    <p>{status}</p>
+                  </div>
+                </li>
+              )
+            })}
         </ul>
         <button onClick={() => setAddingProject(true)}>
           <img src={createProjectIcon} alt="" />
         </button>
       </ProjectMenus>
 
-      <TasksContainer tasks={currentTasks}>
+      <TasksContainer tasks={currentTasks} currentProject={currentProject}>
         {currentProject && (
           <HeaderDashboard
             projectTitle={currentProject.name}

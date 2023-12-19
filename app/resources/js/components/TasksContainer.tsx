@@ -1,6 +1,7 @@
-import { TasksType } from 'App/types/adminDataTypes'
+import { TasksType, projectsType } from 'App/types/adminDataTypes'
 import { FormEvent, ReactNode, useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { projectStore } from '../store/project.store'
 
 const WrapperTasks = styled.section`
   position: relative;
@@ -107,13 +108,32 @@ const WrapperTasks = styled.section`
   }
 `
 
-const TasksContainer = ({ tasks, children }: { tasks: TasksType; children: ReactNode }) => {
+const TasksContainer = ({
+  tasks,
+  children,
+  currentProject,
+}: {
+  tasks: TasksType
+  children: ReactNode
+  currentProject: projectsType[0]
+}) => {
   const [progression, setProgression] = useState<number>(0 || getProgression(tasks))
   const [dynamicTasks, setDynamicTasks] = useState<TasksType>(tasks)
+  const [allProjects, setAllProjects] = projectStore((state) => [
+    state.allProjects,
+    state.setAllProjects,
+  ])
   useEffect(() => {
     setDynamicTasks(tasks)
     setProgression(getProgression(tasks))
-  }, [tasks])
+    setAllProjects(
+      actionChangeStatus(
+        currentProject,
+        progression > 0 && progression < 100 ? 1 : progression === 100 ? 2 : 0,
+        allProjects
+      ) as projectsType
+    )
+  }, [tasks, progression])
 
   function getProgression(tasks: TasksType) {
     let percentage = 0
@@ -141,11 +161,23 @@ const TasksContainer = ({ tasks, children }: { tasks: TasksType; children: React
     return percentage | 0
   }
 
+  function actionChangeStatus(
+    current: TasksType[0] | projectsType[0],
+    status: 0 | 1 | 2,
+    geter: TasksType | projectsType
+  ) {
+    let newStatusObject = Object.assign(current, {
+      status,
+    })
+    const dynamicStatus = geter
+    geter.map((element: TasksType[0] | projectsType[0], index: number) => {
+      element === current ? (dynamicStatus[index] = newStatusObject) : null
+    })
+    return dynamicStatus
+  }
+
   function handleChangeStatus(e: FormEvent<HTMLInputElement>, currentTask: TasksType[0]) {
     let value = parseInt((e.target as HTMLElement).dataset.value!) as 0 | 1 | 2
-    let newStatusObject = Object.assign(currentTask, {
-      status: value,
-    })
 
     fetch('/task/status', {
       method: 'POST',
@@ -156,14 +188,11 @@ const TasksContainer = ({ tasks, children }: { tasks: TasksType; children: React
       body: JSON.stringify({ taskId: currentTask.id, status: value }),
     })
 
-    const newDynamiqueTask: TasksType = dynamicTasks!
+    setDynamicTasks(actionChangeStatus(currentTask, value, dynamicTasks) as TasksType)
 
-    dynamicTasks!.map((task, index) => {
-      task === currentTask ? (newDynamiqueTask[index] = newStatusObject) : null
-    })
-
-    setDynamicTasks(newDynamiqueTask)
-    setProgression(getProgression(newDynamiqueTask))
+    setProgression(
+      getProgression(actionChangeStatus(currentTask, value, dynamicTasks) as TasksType)
+    )
   }
 
   return (
