@@ -1,5 +1,5 @@
 import { userdataType } from '../types/userdatatype'
-import React, { FormEvent,  useRef, useState } from 'react'
+import React, { FormEvent, useRef, useState } from 'react'
 // @ts-ignore: Unreachable code error
 import bgImage from '../images/backgroundImage.png'
 import { ProjectMenus, Wrapper } from '../styles/DashboardStyle'

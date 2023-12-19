@@ -189,10 +189,21 @@ const TasksContainer = ({
     })
 
     setDynamicTasks(actionChangeStatus(currentTask, value, dynamicTasks) as TasksType)
-
-    setProgression(
-      getProgression(actionChangeStatus(currentTask, value, dynamicTasks) as TasksType)
+    const progress = getProgression(
+      actionChangeStatus(currentTask, value, dynamicTasks) as TasksType
     )
+    setProgression(progress)
+    fetch('/project/status', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        projectId: currentProject.id,
+        status: progress > 0 && progress < 100 ? 1 : progress === 100 ? 2 : 0,
+      }),
+    })
   }
 
   return (

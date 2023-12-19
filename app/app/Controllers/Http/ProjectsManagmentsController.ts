@@ -1,6 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Project from 'App/Models/Project'
 import AddProjectValidator from 'App/Validators/AddProjectValidator'
+import { schema } from '@ioc:Adonis/Core/Validator'
 
 export default class ProjectsManagmentsController {
   public async add(ctx: HttpContextContract) {
@@ -15,6 +16,24 @@ export default class ProjectsManagmentsController {
         priority: projectData.priorityValue as 0 | 1 | 2,
       })
       ctx.inertia.location('/dashboard')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  public async status(ctx: HttpContextContract) {
+    const validationSchema = schema.create({
+      projectId: schema.number(),
+      status: schema.number(),
+    })
+
+    try {
+      const projectUpdate = await ctx.request.validate({ schema: validationSchema })
+      await Project.query()
+        .update({
+          status: projectUpdate.status,
+        })
+        .where('id', projectUpdate.projectId)
     } catch (error) {
       console.log(error)
     }
