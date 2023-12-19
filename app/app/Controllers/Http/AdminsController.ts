@@ -42,9 +42,6 @@ export default class AdminsController {
         priority: projects.priority,
       })
     })
-    setTimeout(() => {
-      console.log(this.tableOfTasks)
-    }, 500)
 
     return ctx.inertia.render('Dashboard', {
       errors: { messages: (userDataProjects as unknown as { error: string }).error || '' },

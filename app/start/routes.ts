@@ -13,4 +13,10 @@ Route.get('/logout', async (ctx) => {
 Route.group(() => {
   Route.post('/add', 'ProjectsManagmentsController.add')
 }).prefix('/project')
+
+Route.group(() => {
+  Route.post('/add', 'TasksManagmentsController.add')
+  Route.post('/status', 'TasksManagmentsController.status')
+}).prefix('/task')
+
 Route.get('/dashboard', 'AdminsController.dashboard').middleware('auth')

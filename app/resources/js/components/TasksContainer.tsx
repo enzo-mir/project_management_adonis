@@ -1,5 +1,5 @@
 import { TasksType } from 'App/types/adminDataTypes'
-import React, { ReactNode, useEffect, useState } from 'react'
+import { FormEvent, ReactNode, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 const WrapperTasks = styled.section`
@@ -109,9 +109,9 @@ const WrapperTasks = styled.section`
 
 const TasksContainer = ({ tasks, children }: { tasks: TasksType; children: ReactNode }) => {
   const [progression, setProgression] = useState<number>(0 || getProgression(tasks))
-  const [dinamicTasks, setDinamicTasks] = useState<TasksType>(tasks)
+  const [dynamicTasks, setDynamicTasks] = useState<TasksType>(tasks)
   useEffect(() => {
-    setDinamicTasks(tasks)
+    setDynamicTasks(tasks)
     setProgression(getProgression(tasks))
   }, [tasks])
 
@@ -141,18 +141,28 @@ const TasksContainer = ({ tasks, children }: { tasks: TasksType; children: React
     return percentage | 0
   }
 
-  function handleChangeStatus(e: React.ChangeEvent, currentTask: TasksType[0]) {
+  function handleChangeStatus(e: FormEvent<HTMLInputElement>, currentTask: TasksType[0]) {
     let value = parseInt((e.target as HTMLElement).dataset.value!) as 0 | 1 | 2
     let newStatusObject = Object.assign(currentTask, {
       status: value,
     })
-    const newDynamiqueTask: TasksType = dinamicTasks!
 
-    dinamicTasks!.map((task, index) => {
+    fetch('/task/status', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ taskId: currentTask.id, status: value }),
+    })
+
+    const newDynamiqueTask: TasksType = dynamicTasks!
+
+    dynamicTasks!.map((task, index) => {
       task === currentTask ? (newDynamiqueTask[index] = newStatusObject) : null
     })
 
-    setDinamicTasks(newDynamiqueTask)
+    setDynamicTasks(newDynamiqueTask)
     setProgression(getProgression(newDynamiqueTask))
   }
 
@@ -169,14 +179,13 @@ const TasksContainer = ({ tasks, children }: { tasks: TasksType; children: React
             value={progression.toPrecision(2)}
             min={0}
             max={100}
-            step={1}
             title={progression.toString()}
             disabled
           />
         </label>
       </div>
       <ol id="tasksCont">
-        {dinamicTasks?.map((task, index) => {
+        {dynamicTasks?.map((task, index) => {
           const status = task.status === 0 ? 'todo' : task.status === 1 ? 'doing' : 'done'
           return (
             <li key={task.id} className={status}>
