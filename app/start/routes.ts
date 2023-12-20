@@ -13,6 +13,7 @@ Route.get('/logout', async (ctx) => {
 Route.group(() => {
   Route.post('/add', 'ProjectsManagmentsController.add')
   Route.post('/status', 'ProjectsManagmentsController.status')
+  Route.post('/delete', 'ProjectsManagmentsController.delete')
 }).prefix('/project')
 
 Route.group(() => {

@@ -55,17 +55,29 @@ const ProjectMenus = styled.nav`
     transition: all 0.5s ease-out;
 
     & > li {
+      position: relative;
       display: flex;
       flex-direction: column;
       padding-block-start: 0.5em;
       gap: 0.5em;
       border-radius: 5px;
       transition: all 0.25s ease-out;
+      & > button {
+        display: grid;
+        position: absolute;
+        place-items: center;
+        right: 0;
+        top: 0;
+        color: hsl(242, 50%, 20%);
+        background-color: rgba(255, 255, 255, 1);
+        font-weight: bolder;
+        border-bottom-left-radius: 0.5em;
+      }
       & > h2 {
         font-weight: 400;
       }
 
-      & > *:not(div) {
+      & > *:not(div, button) {
         padding-inline-start: 10px;
         width: 100%;
       }

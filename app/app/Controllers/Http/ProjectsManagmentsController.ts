@@ -15,7 +15,7 @@ export default class ProjectsManagmentsController {
         end_date: projectData.endDateValue,
         priority: projectData.priorityValue as 0 | 1 | 2,
       })
-      ctx.inertia.location('/dashboard')
+      ctx.inertia.redirectBack()
     } catch (error) {
       console.log(error)
     }
@@ -34,8 +34,21 @@ export default class ProjectsManagmentsController {
           status: projectUpdate.status,
         })
         .where('id', projectUpdate.projectId)
+      return ctx.response.status(200)
     } catch (error) {
       console.log(error)
+    }
+  }
+  public async delete(ctx: HttpContextContract) {
+    const projectId = await ctx.request.only(['project']).project
+    try {
+      await Project.query().delete('*').where('id', projectId.id)
+      const allProject = await Project.query().select('*').where('user_id', ctx.auth.user!.id)
+      return ctx.response.status(200).json({
+        allProject,
+      })
+    } catch (error) {
+      return ctx.response.status(400)
     }
   }
 }

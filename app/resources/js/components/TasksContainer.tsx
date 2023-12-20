@@ -14,6 +14,7 @@ const WrapperTasks = styled.section`
 
   & > div.rangeProgressContainer {
     width: 75%;
+    max-width: 750px;
     & > label {
       display: flex;
       gap: 1em;
@@ -267,7 +268,7 @@ const TasksContainer = ({
                 </label>
               </div>
               <div className="statusOverlay">
-                <p>{status}</p>
+                <p>{status[0].toUpperCase() + status.substring(1)}</p>
               </div>
             </li>
           )

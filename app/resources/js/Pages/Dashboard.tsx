@@ -12,7 +12,6 @@ import burgerIcon from '../images/burger.svg'
 import createProjectIcon from '../images/createProjectIcon.svg'
 import { useForm } from '@inertiajs/inertia-react'
 import { projectStore } from '../store/project.store'
-
 const Dashboard = ({
   errors,
   userData,
@@ -34,7 +33,10 @@ const Dashboard = ({
   const [currentProject, setCurrentProject] = useState<projectsType[0]>(
     userData.projects.sort(sortByPriority)[0]
   )
-  const [allProjects] = projectStore((state) => [state.allProjects])
+  const [allProjects, setAllProjects] = projectStore((state) => [
+    state.allProjects,
+    state.setAllProjects,
+  ])
 
   const [currentTasks, setCurrentTasks] = useState<TasksType>(getTasks(currentProject))
   const [addingProject, setAddingProject] = useState<boolean>(false)
@@ -65,6 +67,24 @@ const Dashboard = ({
   function addProject(e: FormEvent) {
     e.preventDefault()
     post('/project/add', { data })
+    setAddingProject(false)
+  }
+
+  async function deleteProject(project: projectsType[0], e: React.MouseEvent) {
+    e.stopPropagation()
+    const r = fetch('/project/delete', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ project }),
+    })
+
+    const t = await r.then((respons) => respons.json())
+    if ((await r.then()).ok) {
+      setAllProjects(t.allProject)
+    }
   }
 
   function handleChangeValues(e: React.ChangeEvent) {
@@ -88,7 +108,7 @@ const Dashboard = ({
         </button>
         <ul>
           {addingProject && (
-            <li className="adding">
+            <li className="adding" onClick={(e) => e.stopPropagation()}>
               <form onSubmit={addProject}>
                 <label htmlFor="nameValue">
                   Name :
@@ -167,6 +187,7 @@ const Dashboard = ({
                   >
                     {projects.name}
                   </h2>
+                  <button onClick={(e) => deleteProject(projects, e)}>x</button>
                   <p
                     onClick={(e) => {
                       e.stopPropagation()
@@ -188,7 +209,13 @@ const Dashboard = ({
               )
             })}
         </ul>
-        <button onClick={() => setAddingProject(true)}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            setAddingProject(true)
+            window.addEventListener('click', () => setAddingProject(false))
+          }}
+        >
           <img src={createProjectIcon} alt="" />
         </button>
       </ProjectMenus>

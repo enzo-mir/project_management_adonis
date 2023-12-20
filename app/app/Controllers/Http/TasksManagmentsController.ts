@@ -19,7 +19,7 @@ export default class TasksManagmentsController {
           status: taskData.status,
         })
         .where('id', taskData.taskId)
-      return ctx.inertia.location('/dashboard')
+      return ctx.response.status(200)
     } catch (error) {
       return ctx.inertia.location('/dashboard')
     }
