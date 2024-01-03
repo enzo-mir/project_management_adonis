@@ -6,7 +6,7 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.uuid('user_id').references('id').inTable('users')
+      table.uuid('user_id').references('id').inTable('users').onDelete('CASCADE')
       table.string('name').notNullable()
       table.string('description').notNullable()
       table.date('start_date')

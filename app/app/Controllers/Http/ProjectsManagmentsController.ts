@@ -15,7 +15,7 @@ export default class ProjectsManagmentsController {
         end_date: projectData.endDateValue,
         priority: projectData.priorityValue as 0 | 1 | 2,
       })
-      ctx.inertia.redirectBack()
+      return ctx.inertia.location('/dashboard')
     } catch (error) {
       console.log(error)
     }
@@ -48,6 +48,8 @@ export default class ProjectsManagmentsController {
         allProject,
       })
     } catch (error) {
+      console.log(error)
+
       return ctx.response.status(400)
     }
   }

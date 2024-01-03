@@ -83,7 +83,11 @@ const Dashboard = ({
 
     const t = await r.then((respons) => respons.json())
     if ((await r.then()).ok) {
-      setAllProjects(t.allProject)
+      setAllProjects(t.allProject.sort(sortByPriority))
+      projectToDisplay(
+        document.getElementById('projectContainer')?.firstChild!,
+        t.allProject.sort(sortByPriority)[0]
+      )
     }
   }
 
@@ -106,7 +110,7 @@ const Dashboard = ({
         <button onClick={handleToggleProjectMenus}>
           <img src={burgerIcon} alt="" />
         </button>
-        <ul>
+        <ul id="projectContainer">
           {addingProject && (
             <li className="adding" onClick={(e) => e.stopPropagation()}>
               <form onSubmit={addProject}>
@@ -167,47 +171,51 @@ const Dashboard = ({
               </form>
             </li>
           )}
-          {((allProjects.length && allProjects) || userData.projects)
-            .sort(sortByPriority)
-            .map((projects, index) => {
-              const status =
-                projects.status === 0 ? 'todo' : projects.status === 1 ? 'doing' : 'done'
-
-              return (
-                <li
-                  key={projects.id}
-                  className={index === 0 ? 'activeProject' : ''}
-                  onClick={(e) => projectToDisplay(e.target, projects)}
-                >
-                  <h2
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      projectToDisplay((e.target as HTMLElement).parentNode!, projects)
-                    }}
-                  >
-                    {projects.name}
-                  </h2>
-                  <button onClick={(e) => deleteProject(projects, e)}>x</button>
-                  <p
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      projectToDisplay((e.target as HTMLElement).parentNode!, projects)
-                    }}
-                  >
-                    {projects.description}
-                  </p>
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      projectToDisplay((e.target as HTMLElement).parentNode!, projects)
-                    }}
-                    className={`project${status[0].toUpperCase() + status.substring(1)}`}
-                  >
-                    <p>{status}</p>
-                  </div>
-                </li>
-              )
-            })}
+          {allProjects?.length || userData.projects
+            ? ((allProjects?.length && allProjects) || userData.projects)
+                .sort(sortByPriority)
+                .map((projects, index) => {
+                  const status =
+                    projects.status === 0 ? 'todo' : projects.status === 1 ? 'doing' : 'done'
+                  const priority =
+                    projects.priority === 0 ? 'low' : projects.priority === 1 ? 'mid' : 'high'
+                  return (
+                    <li
+                      key={projects.id}
+                      className={index === 0 ? 'activeProject' : ''}
+                      onClick={(e) => projectToDisplay(e.target, projects)}
+                    >
+                      <h2
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                        }}
+                      >
+                        {projects.name}
+                      </h2>
+                      <button onClick={(e) => deleteProject(projects, e)}>x</button>
+                      <p
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                        }}
+                      >
+                        {projects.description}
+                      </p>
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                        }}
+                        className={`project${status[0].toUpperCase() + status.substring(1)}`}
+                      >
+                        <p>{status}</p>
+                        <p>priority : {priority}</p>
+                      </div>
+                    </li>
+                  )
+                })
+            : null}
         </ul>
         <button
           onClick={(e) => {

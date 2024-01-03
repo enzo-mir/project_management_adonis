@@ -1,8 +1,35 @@
 import { TasksType, projectsType } from 'App/types/adminDataTypes'
-import { FormEvent, ReactNode, useEffect, useState } from 'react'
+import React, { ChangeEvent, FormEvent, ReactNode, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { projectStore } from '../store/project.store'
+// @ts-ignore: Unreachable code error
 
+import createTaskIcon from '../images/createProjectIcon.svg'
+import { useForm } from '@inertiajs/inertia-react'
+const Wrapper = styled.form`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  padding: 0.5em;
+  border-radius: 5px;
+  & input {
+    background: hsl(242, 50%, 40%);
+    color: white;
+    border: 1px solid black;
+    padding: 0.5em;
+    border-radius: 3px;
+
+    &[type='submit'] {
+      width: fit-content;
+      border: none;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+`
 const WrapperTasks = styled.section`
   position: relative;
   padding: 2em 10%;
@@ -106,6 +133,18 @@ const WrapperTasks = styled.section`
         border-radius: 0 0 8px 8px;
       }
     }
+
+    & button {
+      background-color: transparent;
+      align-self: end;
+      border: none;
+      width: 40px;
+      height: 41px;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
   }
 `
 
@@ -124,9 +163,8 @@ const TasksContainer = ({
     state.allProjects,
     state.setAllProjects,
   ])
+  const [addingTasks, setAddingTasks] = useState(false)
   useEffect(() => {
-    setDynamicTasks(tasks)
-    setProgression(getProgression(tasks))
     setAllProjects(
       actionChangeStatus(
         currentProject,
@@ -134,7 +172,76 @@ const TasksContainer = ({
         allProjects
       ) as projectsType
     )
-  }, [tasks, progression])
+  }, [progression])
+  useEffect(() => {
+    setDynamicTasks(tasks)
+    setProgression(getProgression(tasks))
+  }, [tasks])
+
+  function NewTask() {
+    const { data, setData } = useForm({
+      name: '',
+      description: '',
+      priority: 0,
+      project_id: currentProject.id,
+    })
+
+    function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+      setData({
+        ...data,
+        [e.target.name]: parseInt(e.target.value) || e.target.value,
+      })
+    }
+
+    async function handleSubmit(e: React.FormEvent) {
+      e.preventDefault()
+      const responseData = fetch('/task/add', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      const response = await responseData
+      if (response.ok) {
+        responseData
+          .then((r) => r.json())
+          .then((dataResponse: { id: number }) => {
+            setDynamicTasks([
+              ...dynamicTasks,
+              {
+                id: dataResponse.id,
+                project_id: currentProject.id,
+                name: data.name,
+                description: data.description,
+                status: 0,
+                priority: data.priority as 0 | 1 | 2,
+              },
+            ])
+          })
+        setAddingTasks(false)
+      }
+    }
+    return (
+      <Wrapper onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
+        <label htmlFor="name">
+          Title :
+          <input type="text" name="name" id="name" onChange={handleChange} />
+        </label>
+        <label htmlFor="description">
+          Description :
+          <input type="text" name="description" id="description" onChange={handleChange} />
+        </label>
+        <label htmlFor="priority">
+          Priority :
+          <select name="priority" id="priority" onChange={handleChange}>
+            <option value={0}>Low</option>
+            <option value={1}>Mid</option>
+            <option value={2}>Hight</option>
+          </select>
+        </label>
+        <input type="submit" value="Ajouter" />
+      </Wrapper>
+    )
+  }
 
   function getProgression(tasks: TasksType) {
     let percentage = 0
@@ -167,44 +274,49 @@ const TasksContainer = ({
     status: 0 | 1 | 2,
     geter: TasksType | projectsType
   ) {
-    let newStatusObject = Object.assign(current, {
-      status,
-    })
-    const dynamicStatus = geter
-    geter.map((element: TasksType[0] | projectsType[0], index: number) => {
-      element === current ? (dynamicStatus[index] = newStatusObject) : null
-    })
-    return dynamicStatus
+    if (current) {
+      let newStatusObject = Object.assign(current, {
+        status,
+      })
+      const dynamicStatus = geter
+      geter.map((element: TasksType[0] | projectsType[0], index: number) => {
+        element === current ? (dynamicStatus[index] = newStatusObject) : null
+      })
+      return dynamicStatus
+    }
   }
 
-  function handleChangeStatus(e: FormEvent<HTMLInputElement>, currentTask: TasksType[0]) {
-    let value = parseInt((e.target as HTMLElement).dataset.value!) as 0 | 1 | 2
+  async function handleChangeStatus(e: FormEvent<HTMLInputElement>, currentTask: TasksType[0]) {
+    let statusValue = parseInt((e.target as HTMLElement).dataset.value!) as 0 | 1 | 2
 
-    fetch('/task/status', {
+    const changeStatusResponse = await fetch('/task/status', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ taskId: currentTask.id, status: value }),
+      body: JSON.stringify({ taskId: currentTask.id, status: statusValue }),
     })
+    if (changeStatusResponse.ok) {
+      setDynamicTasks(actionChangeStatus(currentTask, statusValue, dynamicTasks) as TasksType)
 
-    setDynamicTasks(actionChangeStatus(currentTask, value, dynamicTasks) as TasksType)
-    const progress = getProgression(
-      actionChangeStatus(currentTask, value, dynamicTasks) as TasksType
-    )
-    setProgression(progress)
-    fetch('/project/status', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        projectId: currentProject.id,
-        status: progress > 0 && progress < 100 ? 1 : progress === 100 ? 2 : 0,
-      }),
-    })
+      const progress = getProgression(
+        actionChangeStatus(currentTask, statusValue, dynamicTasks) as TasksType
+      )
+      setProgression(progress)
+
+      fetch('/project/status', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectId: currentProject.id,
+          status: progress > 0 && progress < 100 ? 1 : progress === 100 ? 2 : 0,
+        }),
+      }).finally()
+    }
   }
 
   return (
@@ -273,6 +385,19 @@ const TasksContainer = ({
             </li>
           )
         })}
+        {addingTasks && <NewTask />}
+
+        {currentProject && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setAddingTasks(true)
+              window.addEventListener('click', () => setAddingTasks(false))
+            }}
+          >
+            <img src={createTaskIcon} alt="" />
+          </button>
+        )}
       </ol>
     </WrapperTasks>
   )

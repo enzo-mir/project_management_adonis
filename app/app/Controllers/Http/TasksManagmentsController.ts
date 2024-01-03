@@ -4,7 +4,22 @@ import Task from 'App/Models/Task'
 
 export default class TasksManagmentsController {
   public async add(ctx: HttpContextContract) {
-    console.log(ctx.request.all())
+    const validationSchema = schema.create({
+      name: schema.string(),
+      description: schema.string(),
+      priority: schema.number(),
+      project_id: schema.number(),
+    })
+    try {
+      const taskData = await ctx.request.validate({ schema: validationSchema })
+      const creationTask = await Task.create({
+        name: taskData.name,
+        description: taskData.description,
+        priority: taskData.priority as 0 | 1 | 2,
+        project_id: taskData.project_id,
+      })
+      return ctx.response.status(200).json({ id: creationTask.id })
+    } catch (error) {}
   }
   public async status(ctx: HttpContextContract) {
     const validationSchema = schema.create({
