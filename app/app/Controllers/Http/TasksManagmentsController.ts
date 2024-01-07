@@ -39,4 +39,16 @@ export default class TasksManagmentsController {
       return ctx.inertia.location('/dashboard')
     }
   }
+
+  public async delete(ctx: HttpContextContract) {
+    const id: number = await ctx.request.only(['id']).id
+    try {
+      const lineDeleted = await Task.query().select('project_id').where('id', id)
+      const currentProject = lineDeleted[0]
+
+      console.log(currentProject)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }

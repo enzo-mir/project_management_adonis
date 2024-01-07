@@ -42,7 +42,6 @@ export default class AdminsController {
         priority: projects.priority,
       })
     })
-
     return ctx.inertia.render('Dashboard', {
       errors: { messages: (userDataProjects as unknown as { error: string }).error || '' },
       userData: {

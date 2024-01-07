@@ -19,6 +19,7 @@ Route.group(() => {
 Route.group(() => {
   Route.post('/add', 'TasksManagmentsController.add')
   Route.post('/status', 'TasksManagmentsController.status')
+  Route.post('/delete', 'TasksManagmentsController.delete')
 }).prefix('/task')
 
 Route.get('/dashboard', 'AdminsController.dashboard').middleware('auth')

@@ -28,7 +28,7 @@ const ProjectMenus = styled.nav`
   padding: 2em;
   box-shadow: 5px 0 50px rgba(0, 0, 0, 0.5);
 
-  & button {
+  & > button {
     width: 34px;
     height: 29px;
     background-color: transparent;
@@ -62,18 +62,7 @@ const ProjectMenus = styled.nav`
       gap: 0.5em;
       border-radius: 5px;
       transition: all 0.25s ease-out;
-      & > button {
-        display: grid;
-        position: absolute;
-        place-items: center;
-        right: 0;
-        top: 0;
-        color: hsl(242, 50%, 20%);
-        background-color: rgba(255, 255, 255, 1);
-        font-weight: bolder;
-        border-bottom-left-radius: 0.5em;
-      }
-      & > h2 {
+      & > button & > h2 {
         font-weight: 400;
       }
 
@@ -155,4 +144,25 @@ const ProjectMenus = styled.nav`
   }
 `
 
-export { Wrapper, ProjectMenus }
+const DeleteBtn = styled.button`
+  display: grid;
+  position: absolute;
+  place-items: center;
+  width: 10%;
+  aspect-ratio: 1 / 1;
+  right: 0;
+  top: 0;
+  color: hsl(242, 50%, 20%);
+  background-color: rgba(255, 255, 255, 0.7);
+  font-weight: bolder;
+  border-bottom-left-radius: 0.25em;
+  border: none;
+  transition: all 0.2s ease-out;
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 1);
+  }
+`
+
+export { Wrapper, ProjectMenus, DeleteBtn }

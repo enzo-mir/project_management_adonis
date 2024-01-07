@@ -2,7 +2,7 @@ import { userdataType } from '../types/userdatatype'
 import React, { FormEvent, useRef, useState } from 'react'
 // @ts-ignore: Unreachable code error
 import bgImage from '../images/backgroundImage.png'
-import { ProjectMenus, Wrapper } from '../styles/DashboardStyle'
+import { DeleteBtn, ProjectMenus, Wrapper } from '../styles/DashboardStyle'
 import TasksContainer from '../components/TasksContainer'
 import { TasksType, projectsType } from 'App/types/adminDataTypes'
 import HeaderDashboard from '../components/HeaderDashboard'
@@ -38,7 +38,9 @@ const Dashboard = ({
     state.setAllProjects,
   ])
 
-  const [currentTasks, setCurrentTasks] = useState<TasksType>(getTasks(currentProject))
+  const [currentTasks, setCurrentTasks] = useState<TasksType | null>(
+    currentProject ? getTasks(currentProject) : null
+  )
   const [addingProject, setAddingProject] = useState<boolean>(false)
 
   function sortByPriority(a: { priority: number }, b: { priority: number }) {
@@ -49,19 +51,26 @@ const Dashboard = ({
     projectNavRef.current?.classList.toggle('display')
   }
 
-  function projectToDisplay(e: EventTarget, projects: projectsType[0]) {
-    document.querySelector('.activeProject')?.classList.remove('activeProject')
-    ;(e as HTMLElement).classList.add('activeProject')
+  function projectToDisplay(e: EventTarget | null, projects: projectsType[0] | null) {
+    if (e && projects) {
+      document.querySelector('.activeProject')?.classList.remove('activeProject')
+      ;(e as HTMLElement).classList.add('activeProject')
 
-    setCurrentProject(projects)
-    setCurrentTasks(getTasks(projects))
+      setCurrentProject(projects)
+
+      projects && setCurrentTasks(getTasks(projects)!)
+    } else {
+      setCurrentProject(userData.projects.sort(sortByPriority)[0])
+      setCurrentTasks([])
+    }
   }
 
-  function getTasks(projects: projectsType[0]) {
-    const filterTasks = userData.tasks.filter((task) => {
-      return task.project_id === projects.id ? true : false
-    })
-    return filterTasks
+  function getTasks(projects: projectsType[0] | null) {
+    return !!projects
+      ? userData.tasks.filter((task) => {
+          return task.project_id === projects.id ? true : false
+        })
+      : null
   }
 
   function addProject(e: FormEvent) {
@@ -81,12 +90,15 @@ const Dashboard = ({
       body: JSON.stringify({ project }),
     })
 
-    const t = await r.then((respons) => respons.json())
     if ((await r.then()).ok) {
-      setAllProjects(t.allProject.sort(sortByPriority))
+      const filterdArray = (allProjects.length > 0 ? allProjects : userData.projects).filter((p) =>
+        p.id === project.id ? false : true
+      )
+      setAllProjects(filterdArray)
+
       projectToDisplay(
         document.getElementById('projectContainer')?.firstChild!,
-        t.allProject.sort(sortByPriority)[0]
+        filterdArray.sort(sortByPriority)[0]
       )
     }
   }
@@ -172,7 +184,7 @@ const Dashboard = ({
             </li>
           )}
           {allProjects?.length || userData.projects
-            ? ((allProjects?.length && allProjects) || userData.projects)
+            ? (allProjects?.length ? allProjects : userData.projects)
                 .sort(sortByPriority)
                 .map((projects, index) => {
                   const status =
@@ -193,7 +205,7 @@ const Dashboard = ({
                       >
                         {projects.name}
                       </h2>
-                      <button onClick={(e) => deleteProject(projects, e)}>x</button>
+                      <DeleteBtn onClick={(e) => deleteProject(projects, e)}>x</DeleteBtn>
                       <p
                         onClick={(e) => {
                           e.stopPropagation()
@@ -209,8 +221,28 @@ const Dashboard = ({
                         }}
                         className={`project${status[0].toUpperCase() + status.substring(1)}`}
                       >
-                        <p>{status}</p>
-                        <p>priority : {priority}</p>
+                        <p
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            projectToDisplay(
+                              (e.target as HTMLElement).parentNode?.parentNode!,
+                              projects
+                            )
+                          }}
+                        >
+                          {status}
+                        </p>
+                        <p
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            projectToDisplay(
+                              (e.target as HTMLElement).parentNode?.parentNode!,
+                              projects
+                            )
+                          }}
+                        >
+                          priority : {priority}
+                        </p>
                       </div>
                     </li>
                   )
@@ -227,15 +259,16 @@ const Dashboard = ({
           <img src={createProjectIcon} alt="" />
         </button>
       </ProjectMenus>
-
-      <TasksContainer tasks={currentTasks} currentProject={currentProject}>
-        {currentProject && (
-          <HeaderDashboard
-            projectTitle={currentProject.name}
-            projectDescription={currentProject.description}
-          />
-        )}
-      </TasksContainer>
+      {currentTasks && (
+        <TasksContainer tasks={currentTasks} currentProject={currentProject}>
+          {currentProject && (
+            <HeaderDashboard
+              projectTitle={currentProject.name}
+              projectDescription={currentProject.description}
+            />
+          )}
+        </TasksContainer>
+      )}
     </Wrapper>
   )
 }

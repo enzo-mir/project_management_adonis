@@ -42,11 +42,8 @@ export default class ProjectsManagmentsController {
   public async delete(ctx: HttpContextContract) {
     const projectId = await ctx.request.only(['project']).project
     try {
-      await Project.query().delete('*').where('id', projectId.id)
-      const allProject = await Project.query().select('*').where('user_id', ctx.auth.user!.id)
-      return ctx.response.status(200).json({
-        allProject,
-      })
+      await Project.query().delete().where('id', projectId.id)
+      ctx.inertia.redirectBack()
     } catch (error) {
       console.log(error)
 
