@@ -89,6 +89,20 @@ const TasksContainer = ({
                 priority: data.priority as 0 | 1 | 2,
               },
             ])
+
+            setProgression(
+              getProgression([
+                ...dynamicTasks,
+                {
+                  id: dataResponse.id,
+                  project_id: currentProject.id,
+                  name: data.name,
+                  description: data.description,
+                  status: 0,
+                  priority: data.priority as 0 | 1 | 2,
+                },
+              ])
+            )
           })
         setAddingTasks(false)
       }
@@ -175,7 +189,9 @@ const TasksContainer = ({
       const filteredTasksToDisplay = filterArray.filter((task) =>
         task.project_id === currentProject.id ? true : false
       )
+
       setDynamicTasks(filteredTasksToDisplay)
+      setProgression(getProgression(filteredTasksToDisplay))
     }
   }
 
