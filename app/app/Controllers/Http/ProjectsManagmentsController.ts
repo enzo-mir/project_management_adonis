@@ -15,9 +15,12 @@ export default class ProjectsManagmentsController {
         end_date: projectData.endDateValue,
         priority: projectData.priorityValue as 0 | 1 | 2,
       })
-      return ctx.inertia.location('/dashboard')
+
+      const allProjects = await Project.query().where('user_id', ctx.auth.user!.id)
+
+      return ctx.response.status(200).send(allProjects)
     } catch (error) {
-      console.log(error)
+      return ctx.inertia.location('/dashboard')
     }
   }
 

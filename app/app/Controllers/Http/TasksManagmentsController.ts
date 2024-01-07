@@ -19,7 +19,9 @@ export default class TasksManagmentsController {
         project_id: taskData.project_id,
       })
       return ctx.response.status(200).json({ id: creationTask.id })
-    } catch (error) {}
+    } catch (error) {
+      return ctx.inertia.location('/dashboard')
+    }
   }
   public async status(ctx: HttpContextContract) {
     const validationSchema = schema.create({

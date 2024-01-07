@@ -22,8 +22,9 @@ const Dashboard = ({
 }) => {
   const projectNavRef = useRef<HTMLElement>(null)
   console.log(errors)
+
   const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
-  const { data, setData, processing, post } = useForm({
+  const { data, setData, processing } = useForm({
     nameValue: '',
     descValue: '',
     startDateValue: null,
@@ -77,9 +78,24 @@ const Dashboard = ({
       : null
   }
 
-  function addProject(e: FormEvent) {
+  async function addProject(e: FormEvent) {
     e.preventDefault()
-    post('/project/add', { data })
+    const addProject = fetch('/project/add', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    if ((await addProject).ok) {
+      addProject
+        .then((r) => r.json())
+        .then((data) => {
+          setAllProjects(data)
+        })
+    }
+
     setAddingProject(false)
   }
 
@@ -121,9 +137,9 @@ const Dashboard = ({
 
   return (
     <Wrapper>
-      <Link href='/logout'>Log out</Link>
+      <Link href="/logout">Log out</Link>
       <img src={bgImage} alt="" />
-      <ProjectMenus ref={projectNavRef}>
+      <ProjectMenus ref={projectNavRef} className="display">
         <button onClick={handleToggleProjectMenus}>
           <img src={burgerIcon} alt="" />
         </button>
@@ -270,6 +286,8 @@ const Dashboard = ({
             <HeaderDashboard
               projectTitle={currentProject.name}
               projectDescription={currentProject.description}
+              startDate={currentProject.start_date}
+              endDate={currentProject.end_date}
             />
           )}
         </TasksContainer>

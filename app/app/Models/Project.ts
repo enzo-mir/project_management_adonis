@@ -14,24 +14,10 @@ export default class Project extends BaseModel {
   @column()
   public description: string
 
-  @column.date({
-    serialize(value: DateTime) {
-      return value.toISODate()
-    },
-    consume(value: string) {
-      return DateTime.fromISO(value)
-    },
-  })
+  @column.date()
   public start_date: DateTime
 
-  @column.date({
-    serialize(value: DateTime) {
-      return value.toISODate()
-    },
-    consume(value: string) {
-      return DateTime.fromISO(value)
-    },
-  })
+  @column.date()
   public end_date: DateTime
 
   @column()
