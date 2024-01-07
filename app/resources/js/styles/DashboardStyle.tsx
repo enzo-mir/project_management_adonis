@@ -17,6 +17,12 @@ const Wrapper = styled.main`
     filter: brightness(50%);
     object-fit: cover;
   }
+
+  @media screen and (max-width: 650px) {
+    grid-template-columns: 85svw;
+    justify-content: end;
+
+  }
 `
 const ProjectMenus = styled.nav`
   display: grid;
@@ -24,6 +30,8 @@ const ProjectMenus = styled.nav`
   gap: 5%;
   background-color: rgba(83, 74, 255, 0.2);
   height: 100%;
+  max-height: 100svh;
+
   overflow: hidden;
   padding: 2em;
   box-shadow: 5px 0 50px rgba(0, 0, 0, 0.5);
@@ -62,6 +70,7 @@ const ProjectMenus = styled.nav`
       gap: 0.5em;
       border-radius: 5px;
       transition: all 0.25s ease-out;
+      width: clamp(200px, 20vw, 300px);
       & > button & > h2 {
         font-weight: 400;
       }
@@ -139,7 +148,30 @@ const ProjectMenus = styled.nav`
     width: 100%;
 
     & ul {
-      width: clamp(250px, 20vw, 350px);
+      width: clamp(200px, 20vw, 300px);
+    }
+  }
+
+  @media screen and (max-width: 650px) {
+    position: absolute;
+    padding: 1em;
+    z-index: 50;
+    background-color: hsl(242, 51%, 30%);
+    transition: all 0.5s ease-out;
+    width: 75px;
+
+    &.display {
+      width: 100%;
+      & > ul#projectContainer {
+        width: 80vw;
+      }
+    }
+
+    & > ul#projectContainer {
+      width: 0vw;
+      & > li {
+        width: 100%;
+      }
     }
   }
 `

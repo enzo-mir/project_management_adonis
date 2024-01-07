@@ -3,11 +3,13 @@ import styled from 'styled-components'
 const WrapperTasks = styled.section`
   position: relative;
   padding: 2em 10%;
+  max-height: 100svh;
   display: grid;
   grid-template-rows: auto auto 1fr;
   gap: 2em;
   place-items: center;
   color: white;
+  overflow: auto;
 
   & > div.rangeProgressContainer {
     width: 75%;
@@ -23,9 +25,19 @@ const WrapperTasks = styled.section`
         width: 100%;
       }
     }
+
+    @media screen and (max-width: 650px) {
+      width: 100%;
+
+      & > label {
+        flex-direction: column;
+        width: 100%;
+      }
+    }
   }
   & > ol#tasksCont {
     display: flex;
+    justify-content: center;
     gap: 2em;
     flex-wrap: wrap;
     justify-self: start;
@@ -63,6 +75,11 @@ const WrapperTasks = styled.section`
 
       & > p {
         font-size: 1.25em;
+        padding-inline: 1em;
+      }
+
+      & > h2 {
+        padding-inline: 1em;
       }
       & > .inputStatus {
         display: flex;
@@ -108,13 +125,13 @@ const WrapperTasks = styled.section`
       background-color: transparent;
       align-self: end;
       border: none;
-      width: 40px;
-      height: 41px;
-
       &:hover {
         cursor: pointer;
       }
     }
+  }
+
+  @media screen and (max-width: 650px) {
   }
 `
 const Wrapper = styled.form`

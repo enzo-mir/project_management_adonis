@@ -122,7 +122,7 @@ const Dashboard = ({
   return (
     <Wrapper>
       <img src={bgImage} alt="" />
-      <ProjectMenus ref={projectNavRef} className="display">
+      <ProjectMenus ref={projectNavRef}>
         <button onClick={handleToggleProjectMenus}>
           <img src={burgerIcon} alt="" />
         </button>
