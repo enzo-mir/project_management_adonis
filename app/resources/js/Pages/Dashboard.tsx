@@ -10,7 +10,7 @@ import HeaderDashboard from '../components/HeaderDashboard'
 import burgerIcon from '../images/burger.svg'
 // @ts-ignore: Unreachable code error
 import createProjectIcon from '../images/createProjectIcon.svg'
-import { useForm } from '@inertiajs/inertia-react'
+import { Link, useForm } from '@inertiajs/inertia-react'
 import { projectStore } from '../store/project.store'
 import { taskStore } from '../store/task.store'
 const Dashboard = ({
@@ -121,6 +121,7 @@ const Dashboard = ({
 
   return (
     <Wrapper>
+      <Link href='/logout'>Log out</Link>
       <img src={bgImage} alt="" />
       <ProjectMenus ref={projectNavRef}>
         <button onClick={handleToggleProjectMenus}>

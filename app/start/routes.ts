@@ -8,7 +8,7 @@ Route.get('/login', 'LoginController.index')
 Route.post('/login', 'LoginController.login')
 Route.get('/logout', async (ctx) => {
   await ctx.auth.logout()
-  return ctx.inertia.location('/')
+  return ctx.inertia.location('/login')
 })
 Route.group(() => {
   Route.post('/add', 'ProjectsManagmentsController.add')
@@ -23,3 +23,6 @@ Route.group(() => {
 }).prefix('/task')
 
 Route.get('/dashboard', 'AdminsController.dashboard').middleware('auth')
+Route.any('/*', async ({ inertia }) => {
+  return inertia.render('Undefined')
+})
