@@ -1,5 +1,5 @@
 import { userdataType } from '../types/userdatatype'
-import React, { FormEvent, useRef, useState } from 'react'
+import React, { FormEvent, useEffect, useRef, useState } from 'react'
 // @ts-ignore: Unreachable code error
 import bgImage from '../images/backgroundImage.png'
 import { DeleteBtn, ProjectMenus, Wrapper } from '../styles/DashboardStyle'
@@ -12,6 +12,7 @@ import burgerIcon from '../images/burger.svg'
 import createProjectIcon from '../images/createProjectIcon.svg'
 import { useForm } from '@inertiajs/inertia-react'
 import { projectStore } from '../store/project.store'
+import { taskStore } from '../store/task.store'
 const Dashboard = ({
   errors,
   userData,
@@ -21,7 +22,7 @@ const Dashboard = ({
 }) => {
   const projectNavRef = useRef<HTMLElement>(null)
   console.log(errors)
-
+  const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
   const { data, setData, processing, post } = useForm({
     nameValue: '',
     descValue: '',
@@ -29,6 +30,9 @@ const Dashboard = ({
     endDateValue: null,
     priorityValue: 0,
   })
+  useEffect(() => {
+    setAllTasks(userData.tasks)
+  }, [userData.tasks])
 
   const [currentProject, setCurrentProject] = useState<projectsType[0]>(
     userData.projects.sort(sortByPriority)[0]
@@ -67,7 +71,7 @@ const Dashboard = ({
 
   function getTasks(projects: projectsType[0] | null) {
     return !!projects
-      ? userData.tasks.filter((task) => {
+      ? (allTasks.length ? allTasks : userData.tasks).filter((task) => {
           return task.project_id === projects.id ? true : false
         })
       : null

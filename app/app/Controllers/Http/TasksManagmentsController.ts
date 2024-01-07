@@ -43,12 +43,10 @@ export default class TasksManagmentsController {
   public async delete(ctx: HttpContextContract) {
     const id: number = await ctx.request.only(['id']).id
     try {
-      const lineDeleted = await Task.query().select('project_id').where('id', id)
-      const currentProject = lineDeleted[0]
-
-      console.log(currentProject)
+      await Task.query().delete().where('id', id)
+      ctx.inertia.redirectBack()
     } catch (error) {
-      console.log(error)
+      ctx.response.status(400)
     }
   }
 }

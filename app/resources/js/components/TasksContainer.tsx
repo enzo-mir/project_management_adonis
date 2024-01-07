@@ -7,6 +7,7 @@ import createTaskIcon from '../images/createProjectIcon.svg'
 import { useForm } from '@inertiajs/inertia-react'
 import { DeleteBtn } from '../styles/DashboardStyle'
 import { Wrapper, WrapperTasks } from '../styles/TasksStyle'
+import { taskStore } from '../store/task.store'
 
 const TasksContainer = ({
   tasks,
@@ -23,6 +24,7 @@ const TasksContainer = ({
     state.allProjects,
     state.setAllProjects,
   ])
+  const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
   const [addingTasks, setAddingTasks] = useState(false)
   useEffect(() => {
     setAllProjects(
@@ -67,6 +69,17 @@ const TasksContainer = ({
           .then((dataResponse: { id: number }) => {
             setDynamicTasks([
               ...dynamicTasks,
+              {
+                id: dataResponse.id,
+                project_id: currentProject.id,
+                name: data.name,
+                description: data.description,
+                status: 0,
+                priority: data.priority as 0 | 1 | 2,
+              },
+            ])
+            setAllTasks([
+              ...allTasks,
               {
                 id: dataResponse.id,
                 project_id: currentProject.id,
@@ -157,11 +170,12 @@ const TasksContainer = ({
     })
 
     if ((await deleteResponse).ok) {
-      deleteResponse
-        .then((r) => r.json())
-        .then((data: TasksType) => {
-          setDynamicTasks(data)
-        })
+      const filterArray = allTasks.filter((task) => (task.id === task_id ? false : true))
+      setAllTasks(filterArray)
+      const filteredTasksToDisplay = filterArray.filter((task) =>
+        task.project_id === currentProject.id ? true : false
+      )
+      setDynamicTasks(filteredTasksToDisplay)
     }
   }
 
