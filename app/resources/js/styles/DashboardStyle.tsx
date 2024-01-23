@@ -7,19 +7,6 @@ const Wrapper = styled.main`
   width: 100%;
   height: 100%;
 
-  & > a {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    text-decoration: none;
-    font-size: 1em;
-    padding: 0.5em;
-    border-radius: 3px;
-    background: hsl(242, 50%, 50%);
-    color: white;
-    z-index: 50;
-  }
-
   & > img {
     position: absolute;
     top: 0;
@@ -32,7 +19,7 @@ const Wrapper = styled.main`
   }
 
   @media screen and (max-width: 650px) {
-    grid-template-columns: 85svw;
+    grid-template-columns: 80svw;
     justify-content: end;
   }
 `

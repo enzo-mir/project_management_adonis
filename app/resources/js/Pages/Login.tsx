@@ -1,9 +1,10 @@
-import { Head, InertiaLink, useForm } from '@inertiajs/inertia-react'
-import { errors } from '../types/authTypeErrors'
+import { Head, Link, useForm } from '@inertiajs/inertia-react'
 import Layout from './Layout'
 import { WrapperForms } from '../styles/FormsWrapper'
+import { useState } from 'react'
 
-const Login = ({ errors }: { errors: errors }) => {
+const Login = () => {
+  const [errorMessage, setErrorMessage] = useState<{ password?: string; email?: string }>({})
   const { data, setData, post, processing } = useForm({
     email: '',
     username: '',
@@ -12,7 +13,13 @@ const Login = ({ errors }: { errors: errors }) => {
 
   function handlSubmitLogin(e: React.FormEvent) {
     e.preventDefault()
-    post('/login', { data })
+    post('/login', {
+      data,
+      onError: (error) => {
+        setErrorMessage(error as unknown as { password?: string; email?: string })
+      },
+      onSuccess: () => {},
+    })
   }
 
   function handleChangeValue(e: React.ChangeEvent) {
@@ -31,7 +38,7 @@ const Login = ({ errors }: { errors: errors }) => {
             Email adress<i title="Must be a valid email">*</i>
           </p>
           <input type="email" name="email" id="emailLogin" onChange={handleChangeValue} required />
-          {errors.messages?.email && <p>{errors.messages?.email}</p>}
+          {errorMessage?.email ? <p>{errorMessage.email}</p> : null}
         </label>
 
         <label htmlFor="passwordLogin">
@@ -46,13 +53,13 @@ const Login = ({ errors }: { errors: errors }) => {
             onChange={handleChangeValue}
             required
           />
-          {errors.messages?.password && <p>{errors.messages?.password}</p>}
+          {errorMessage?.password ? <p>{errorMessage.password}</p> : null}
         </label>
         <div className="cta">
           <button type="submit" disabled={processing}>
             Submit
           </button>
-          <InertiaLink href="/register">Do not have account ?</InertiaLink>
+          <Link href="/register">Do not have account ?</Link>
         </div>
       </form>
     </WrapperForms>

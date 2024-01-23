@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 const WrapperTasks = styled.section`
   position: relative;
-  padding: 2em 10%;
+  padding: 4em 10% 2em 10%;
   max-height: 100svh;
   display: grid;
   grid-template-rows: auto auto 1fr;
@@ -110,6 +110,8 @@ const WrapperTasks = styled.section`
       & > .statusOverlay {
         position: absolute;
         display: flex;
+        flex-direction: column;
+        gap: 0.25em;
         justify-content: center;
         align-items: center;
         transition: all 0.2s ease-out;
@@ -118,6 +120,10 @@ const WrapperTasks = styled.section`
         transform: translateY(0%);
         height: 75px;
         border-radius: 0 0 8px 8px;
+
+        & > span {
+          font-size: 0.8em;
+        }
       }
     }
 
@@ -129,9 +135,6 @@ const WrapperTasks = styled.section`
         cursor: pointer;
       }
     }
-  }
-
-  @media screen and (max-width: 650px) {
   }
 `
 const Wrapper = styled.form`

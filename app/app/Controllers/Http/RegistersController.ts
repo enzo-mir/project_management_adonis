@@ -4,7 +4,7 @@ import RegisterValidator from 'App/Validators/AuthValidator'
 
 export default class RegistersController {
   public async index(ctx: HttpContextContract) {
-    return ctx.inertia.render('Register', { errors: { messages: '' } })
+    return ctx.inertia.render('Register')
   }
 
   public async register(ctx: HttpContextContract) {
@@ -13,7 +13,8 @@ export default class RegistersController {
       await User.create(data)
       return ctx.inertia.location('/login')
     } catch (error) {
-      return ctx.inertia.render('Register', { errors: error })
+      ctx.session.flash({ errors: error.messages })
+      return ctx.response.redirect().back()
     }
   }
 }

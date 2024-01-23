@@ -16,7 +16,7 @@ export default class RegisterValidator {
 
   public messages: CustomMessages = {
     'password.minLength': 'Password must be further than 8 char',
-    'username.minLength': 'Password must be further than 4 char',
+    'username.minLength': 'Username must be further than 4 char',
     'email.email': 'Email invalid',
     'email.unique': 'The adress email is already used !',
   }

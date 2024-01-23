@@ -1,10 +1,16 @@
-import { InertiaLink, useForm } from '@inertiajs/inertia-react'
-import type { errors } from '../types/authTypeErrors'
+import { Link, useForm } from '@inertiajs/inertia-react'
 import { Head } from '@inertiajs/inertia-react'
 import Layout from './Layout'
 import { WrapperForms } from '../styles/FormsWrapper'
+import { useState } from 'react'
 
-const Register = ({ errors }: { errors: errors }) => {
+const Register = () => {
+  const [errorMessage, setErrorMessage] = useState<{
+    password?: string
+    email?: string
+    username?: string
+  }>({})
+
   const { data, setData, post, processing } = useForm({
     email: '',
     username: '',
@@ -13,7 +19,20 @@ const Register = ({ errors }: { errors: errors }) => {
 
   function handlSubmitRegister(e: React.FormEvent) {
     e.preventDefault()
-    post('/register', { data })
+    post('/register', {
+      data,
+      onError: (err) => {
+        console.log(err);
+        
+        setErrorMessage(
+          err as unknown as {
+            password?: string
+            email?: string
+            username?: string
+          }
+        )
+      },
+    })
   }
 
   function handleChangeValue(e: React.ChangeEvent) {
@@ -40,7 +59,7 @@ const Register = ({ errors }: { errors: errors }) => {
               onChange={handleChangeValue}
               required
             />
-            {errors.messages?.email && <p>{errors.messages?.email}</p>}
+            {errorMessage?.email ? <p>{errorMessage.email}</p> : null}
           </label>
           <label htmlFor="usernameRegister">
             <p>
@@ -54,7 +73,7 @@ const Register = ({ errors }: { errors: errors }) => {
               onChange={handleChangeValue}
               required
             />
-            {errors.messages?.username && <p>{errors.messages?.username}</p>}
+            {errorMessage?.username ? <p>{errorMessage.username}</p> : null}
           </label>
           <label htmlFor="passwordRegister">
             <p>
@@ -68,13 +87,13 @@ const Register = ({ errors }: { errors: errors }) => {
               onChange={handleChangeValue}
               required
             />
-            {errors.messages?.password && <p>{errors.messages?.password}</p>}
+            {errorMessage?.password ? <p>{errorMessage.password}</p> : null}
           </label>
           <div className="cta">
             <button type="submit" disabled={processing}>
               Submit
             </button>
-            <InertiaLink href="/login">You have an account ?</InertiaLink>
+            <Link href="/login">You have an account ?</Link>
           </div>
         </form>
       </WrapperForms>

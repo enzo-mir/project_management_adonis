@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/inertia-react'
 import styled from 'styled-components'
 const HeaderWrapper = styled.header`
   display: flex;
@@ -18,14 +19,25 @@ const HeaderWrapper = styled.header`
     left: 10px;
     top: 10px;
     text-decoration: none;
-    font-size: 1em;
+    font-size: 0.8em;
     padding: 0.5em;
     border-radius: 3px;
     background-color: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
     border: 2px solid hsl(242, 50%, 50%);
     color: white;
-    z-index: 50;
+  }
+
+  & > a {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    text-decoration: none;
+    font-size: 1em;
+    padding: 0.5em;
+    border-radius: 3px;
+    background: hsl(242, 50%, 50%);
+    color: white;
   }
 `
 
@@ -48,6 +60,7 @@ const HeaderDashboard = ({
       </span>
       <h1>{projectTitle}</h1>
       <p>{projectDescription}</p>
+      <Link href="/logout">Log out</Link>
     </HeaderWrapper>
   )
 }

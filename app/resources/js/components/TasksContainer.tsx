@@ -36,9 +36,13 @@ const TasksContainer = ({
     )
   }, [progression])
   useEffect(() => {
-    setDynamicTasks(tasks)
+    setDynamicTasks(tasks.sort(sortByPriority))
     setProgression(getProgression(tasks))
   }, [tasks])
+
+  function sortByPriority(a: { priority: number }, b: { priority: number }) {
+    return a.priority > b.priority ? -1 : 1
+  }
 
   function NewTask() {
     const { data, setData } = useForm({
@@ -67,7 +71,7 @@ const TasksContainer = ({
         responseData
           .then((r) => r.json())
           .then((dataResponse: { id: number }) => {
-            setDynamicTasks([
+            const newTasksToSet: TasksType = [
               ...dynamicTasks,
               {
                 id: dataResponse.id,
@@ -77,7 +81,8 @@ const TasksContainer = ({
                 status: 0,
                 priority: data.priority as 0 | 1 | 2,
               },
-            ])
+            ]
+            setDynamicTasks(newTasksToSet.sort(sortByPriority))
             setAllTasks([
               ...allTasks,
               {
@@ -110,15 +115,14 @@ const TasksContainer = ({
     return (
       <Wrapper onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
         <label htmlFor="name">
-          Title :
-          <input type="text" name="name" id="name" onChange={handleChange} />
+          Title : <input type="text" name="name" id="name" onChange={handleChange} required />
         </label>
         <label htmlFor="description">
-          Description :
-          <input type="text" name="description" id="description" onChange={handleChange} />
+          Description :{' '}
+          <input type="text" name="description" id="description" onChange={handleChange} required />
         </label>
         <label htmlFor="priority">
-          Priority :
+          Priority :{' '}
           <select name="priority" id="priority" onChange={handleChange}>
             <option value={0}>Low</option>
             <option value={1}>Mid</option>
@@ -186,9 +190,9 @@ const TasksContainer = ({
     if ((await deleteResponse).ok) {
       const filterArray = allTasks.filter((task) => (task.id === task_id ? false : true))
       setAllTasks(filterArray)
-      const filteredTasksToDisplay = filterArray.filter((task) =>
-        task.project_id === currentProject.id ? true : false
-      )
+      const filteredTasksToDisplay = filterArray
+        .filter((task) => (task.project_id === currentProject.id ? true : false))
+        .sort(sortByPriority)
 
       setDynamicTasks(filteredTasksToDisplay)
       setProgression(getProgression(filteredTasksToDisplay))
@@ -251,6 +255,7 @@ const TasksContainer = ({
       <ol id="tasksCont">
         {dynamicTasks?.map((task, index) => {
           const status = task.status === 0 ? 'todo' : task.status === 1 ? 'doing' : 'done'
+          const priority = task.priority === 0 ? 'low' : task.priority === 1 ? 'mid' : 'high'
           return (
             <li key={task.id} className={status}>
               <DeleteBtn onClick={() => deleteTask(task.id)}>x</DeleteBtn>
@@ -293,6 +298,7 @@ const TasksContainer = ({
               </div>
               <div className="statusOverlay">
                 <p>{status[0].toUpperCase() + status.substring(1)}</p>
+                <span>Priority : {priority}</span>
               </div>
             </li>
           )

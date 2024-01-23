@@ -1,16 +1,16 @@
-const { join } = require("path");
-const Encore = require("@symfony/webpack-encore");
+const { join } = require('path')
+const Encore = require('@symfony/webpack-encore')
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
-  Encore.configureRuntimeEnvironment(process.env.NODE_ENV || "dev");
+  Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev')
 }
 
-Encore.setOutputPath("./public/assets");
-Encore.setPublicPath("/assets");
+Encore.setOutputPath('./public/assets')
+Encore.setPublicPath('/assets')
 
-Encore.addEntry("app", "./resources/js/app.tsx");
-Encore.enableTypeScriptLoader();
-Encore.enableReactPreset();
+Encore.addEntry('app', './resources/js/app.tsx')
+Encore.enableTypeScriptLoader()
+Encore.enableReactPreset()
 
 /*
 |--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ Encore.enableReactPreset();
 | Treat each entry point and its dependencies as its own isolated module.
 |
 */
-Encore.disableSingleRuntimeChunk();
+Encore.disableSingleRuntimeChunk()
 
 /*
 |--------------------------------------------------------------------------
@@ -60,7 +60,7 @@ Encore.disableSingleRuntimeChunk();
 | will ensure that all unused files from the previous build are removed.
 |
 */
-Encore.cleanupOutputBeforeBuild();
+Encore.cleanupOutputBeforeBuild()
 
 /*
 |--------------------------------------------------------------------------
@@ -70,7 +70,7 @@ Encore.cleanupOutputBeforeBuild();
 | Enable source maps in production
 |
 */
-Encore.enableSourceMaps(!Encore.isProduction());
+Encore.enableSourceMaps(!Encore.isProduction())
 
 /*
 |--------------------------------------------------------------------------
@@ -80,7 +80,7 @@ Encore.enableSourceMaps(!Encore.isProduction());
 | Enable assets versioning to leverage lifetime browser and CDN cache
 |
 */
-Encore.enableVersioning(Encore.isProduction());
+Encore.enableVersioning(Encore.isProduction())
 
 /*
 |--------------------------------------------------------------------------
@@ -97,20 +97,20 @@ Encore.configureDevServerOptions((options) => {
    * Normalize "options.static" property to an array
    */
   if (!options.static) {
-    options.static = [];
+    options.static = []
   } else if (!Array.isArray(options.static)) {
-    options.static = [options.static];
+    options.static = [options.static]
   }
 
   /**
    * Enable live reload and add views directory
    */
-  options.liveReload = true;
+  options.liveReload = true
   options.static.push({
-    directory: join(__dirname, "./resources/views"),
+    directory: join(__dirname, './resources/views'),
     watch: true,
-  });
-});
+  })
+})
 
 /*
 |--------------------------------------------------------------------------
@@ -162,11 +162,30 @@ Encore.configureDevServerOptions((options) => {
 | the level to "info".
 |
 */
-const config = Encore.getWebpackConfig();
-config.infrastructureLogging = {
-  level: "warn",
-};
-config.stats = "errors-warnings";
+
+Encore.configureSplitChunks((splitChunks) => {
+  ;(splitChunks.chunks = 'all'),
+    (splitChunks.maxInitialRequests = Infinity),
+    (splitChunks.minSize = 20000),
+    (splitChunks.minRemainingSize = 0),
+    (splitChunks.minChunks = 2),
+    (splitChunks.maxAsyncRequests = 30),
+    (splitChunks.enforceSizeThreshold = 50000),
+    (splitChunks.cacheGroups = {
+      defaultVendors: {
+        test: /[\\/]node_modules[\\/]/,
+        priority: -10,
+        reuseExistingChunk: true,
+      },
+      default: {
+        minChunks: 2,
+        priority: -20,
+        reuseExistingChunk: true,
+      },
+    })
+})
+
+const config = Encore.getWebpackConfig()
 
 /*
 |--------------------------------------------------------------------------
@@ -176,4 +195,4 @@ config.stats = "errors-warnings";
 | Export config for webpack to do its job
 |
 */
-module.exports = config;
+module.exports = config
