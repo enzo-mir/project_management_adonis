@@ -39,7 +39,7 @@ Encore.enableReactPreset()
 | https://webpack.js.org/plugins/split-chunks-plugin/
 |
 */
-// Encore.splitEntryChunks()
+ Encore.splitEntryChunks()
 
 /*
 |--------------------------------------------------------------------------

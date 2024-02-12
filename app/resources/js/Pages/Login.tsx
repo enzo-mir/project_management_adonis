@@ -18,7 +18,6 @@ const Login = () => {
       onError: (error) => {
         setErrorMessage(error as unknown as { password?: string; email?: string })
       },
-      onSuccess: () => {},
     })
   }
 

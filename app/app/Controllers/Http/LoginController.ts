@@ -16,7 +16,7 @@ export default class LoginController {
       if (!(await Hash.verify(getDatabsePwd[0].password, password)))
         throw { message: { password: 'Password incorrect' } }
       await ctx.auth.attempt(email, password)
-      return ctx.inertia.location('/dashboard')
+      return ctx.response.redirect("/dashboard")
     } catch (error) {
       ctx.session.flash({
         errors: error.message,

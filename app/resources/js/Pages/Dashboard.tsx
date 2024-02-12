@@ -15,13 +15,18 @@ import { projectStore } from '../store/project.store'
 import { taskStore } from '../store/task.store'
 const Dashboard = ({
   errors,
+  projects,
+  tasks,
   userData,
 }: {
   errors: { messages: string }
   userData: userdataType
+  projects: projectsType
+  tasks: TasksType
 }) => {
   const projectNavRef = useRef<HTMLElement>(null)
-  console.log(errors)
+
+  console.log(projects)
 
   const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
   const { data, setData, processing } = useForm({
@@ -32,11 +37,11 @@ const Dashboard = ({
     priorityValue: 0,
   })
   useEffect(() => {
-    setAllTasks(userData.tasks)
-  }, [userData.tasks])
+    setAllTasks(tasks)
+  }, [tasks])
 
   const [currentProject, setCurrentProject] = useState<projectsType[0]>(
-    userData.projects.sort(sortByPriority)[0]
+    projects.sort(sortByPriority)[0]
   )
   const [allProjects, setAllProjects] = projectStore((state) => [
     state.allProjects,
@@ -56,23 +61,23 @@ const Dashboard = ({
     projectNavRef.current?.classList.toggle('display')
   }
 
-  function projectToDisplay(e: EventTarget | null, projects: projectsType[0] | null) {
-    if (e && projects) {
+  function projectToDisplay(e: EventTarget | null, project: projectsType[0] | null) {
+    if (e && project !== null) {
       document.querySelector('.activeProject')?.classList.remove('activeProject')
       ;(e as HTMLElement).classList.add('activeProject')
 
-      setCurrentProject(projects)
+      setCurrentProject(project)
 
-      projects && setCurrentTasks(getTasks(projects)!)
+      project && setCurrentTasks(getTasks(project)!)
     } else {
-      setCurrentProject(userData.projects.sort(sortByPriority)[0])
+      setCurrentProject(projects.sort(sortByPriority)[0])
       setCurrentTasks([])
     }
   }
 
   function getTasks(projects: projectsType[0] | null) {
     return !!projects
-      ? (allTasks.length ? allTasks : userData.tasks).filter((task) => {
+      ? (allTasks.length ? allTasks : tasks).filter((task) => {
           return task.project_id === projects.id ? true : false
         })
       : null
@@ -111,7 +116,7 @@ const Dashboard = ({
     })
 
     if ((await r.then()).ok) {
-      const filterdArray = (allProjects.length > 0 ? allProjects : userData.projects).filter((p) =>
+      const filterdArray = (allProjects.length > 0 ? allProjects : projects).filter((p) =>
         p.id === project.id ? false : true
       )
       setAllProjects(filterdArray)
@@ -203,8 +208,8 @@ const Dashboard = ({
               </form>
             </li>
           )}
-          {allProjects?.length || userData.projects
-            ? (allProjects?.length ? allProjects : userData.projects)
+          {allProjects?.length || projects
+            ? (allProjects?.length ? allProjects : projects)
                 .sort(sortByPriority)
                 .map((projects, index) => {
                   const status =

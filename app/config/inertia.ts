@@ -3,7 +3,7 @@
  * if you find something broken in this config file.
  */
 
-import { InertiaConfig } from '@ioc:EidelLev/Inertia';
+import { InertiaConfig } from '@ioc:EidelLev/Inertia'
 
 /*
 |--------------------------------------------------------------------------
@@ -17,4 +17,4 @@ export const inertia: InertiaConfig = {
   ssr: {
     enabled: false,
   },
-};
+}

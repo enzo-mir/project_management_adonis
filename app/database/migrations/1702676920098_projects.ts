@@ -14,6 +14,19 @@ export default class extends BaseSchema {
       table.tinyint('status').defaultTo(0)
       table.tinyint('priority').defaultTo(0)
     })
+
+    this.defer(async (db) => {
+      await db.table(this.tableName).insert({
+        id: 1,
+        user_id: 1,
+        name: 'project1',
+        description: 'desc1',
+        start_date: new Date(),
+        end_date: new Date(),
+        status: 1,
+        priority: 1,
+      })
+    })
   }
 
   public async down() {
