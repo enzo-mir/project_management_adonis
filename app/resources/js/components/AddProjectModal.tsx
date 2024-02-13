@@ -2,7 +2,7 @@ import { useForm } from '@inertiajs/inertia-react'
 import React, { FormEvent } from 'react'
 import { FormAddProject } from '../styles/FormAddProject.style'
 
-const AddProjectModal = () => {
+const AddProjectModal = ({ setOpen }: { setOpen(val: boolean): void }) => {
   const { data, setData, processing, post } = useForm({
     nameValue: '',
     descValue: '',
@@ -25,7 +25,12 @@ const AddProjectModal = () => {
 
   async function addProject(e: FormEvent) {
     e.preventDefault()
-    post('/project/add', { data })
+    post('/project/add', {
+      data,
+      onSuccess: () => {
+        setOpen(false)
+      },
+    })
   }
 
   return (

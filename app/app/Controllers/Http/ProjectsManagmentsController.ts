@@ -16,11 +16,12 @@ export default class ProjectsManagmentsController {
         priority: projectData.priorityValue as 0 | 1 | 2,
       })
 
-      const allProjects = await Project.query().where('user_id', ctx.auth.user!.id)
-
-      return ctx.response.status(200).send(allProjects)
+      return ctx.response.redirect().back()
     } catch (error) {
-      return ctx.inertia.location('/dashboard')
+      ctx.session.flash({
+        errors: error.message || 'Error durring project adding',
+      })
+      return ctx.response.redirect().back()
     }
   }
 

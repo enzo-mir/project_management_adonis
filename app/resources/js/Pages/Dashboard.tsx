@@ -110,7 +110,7 @@ const Dashboard = ({
       {adding && addingProject ? (
         <DivModal onClick={() => setAdding(false)}>
           <ModalComponent open={adding} setOpen={setAdding} title={addingProject && 'Add project'}>
-            {addingProject && <AddProjectModal />}
+            {addingProject && <AddProjectModal setOpen={setAdding} />}
           </ModalComponent>
         </DivModal>
       ) : null}
