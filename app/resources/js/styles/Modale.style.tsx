@@ -10,12 +10,25 @@ export const DivModal = styled.div`
   z-index: 40;
 `
 export const ModalComponentWrapper = styled.dialog`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   position: absolute;
+  gap: 1em;
   top: 50%;
   left: 50%;
   border: none !important;
   border-radius: 10px;
   transform: translate(-50%, -50%);
-  padding: 1.5rem;
+  padding: 1rem;
   z-index: 50;
+
+  & > button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    aspect-ratio: 1 / 1;
+  }
 `

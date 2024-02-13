@@ -1,5 +1,5 @@
 import { userdataType } from '../types/userdatatype'
-import React, { FormEvent, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 // @ts-ignore: Unreachable code error
 import bgImage from '../images/backgroundImage.png'
 import { DeleteBtn, ProjectMenus, Wrapper } from '../styles/DashboardStyle'
@@ -10,11 +10,11 @@ import HeaderDashboard from '../components/HeaderDashboard'
 import burgerIcon from '../images/burger.svg'
 // @ts-ignore: Unreachable code error
 import createProjectIcon from '../images/createProjectIcon.svg'
-import { useForm } from '@inertiajs/inertia-react'
 import { projectStore } from '../store/project.store'
 import { taskStore } from '../store/task.store'
 import ModalComponent from '../components/ModalComponent'
 import { DivModal } from '../styles/Modale.style'
+import AddProjectModal from '../components/AddProjectModal'
 const Dashboard = ({
   errors,
   projects,
@@ -35,13 +35,7 @@ const Dashboard = ({
   console.log(errors, userData)
 
   const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
-  const { data, setData, processing } = useForm({
-    nameValue: '',
-    descValue: '',
-    startDateValue: null,
-    endDateValue: null,
-    priorityValue: 0,
-  })
+
   useEffect(() => {
     setAllTasks(tasks)
     setAllProjects(projects)
@@ -55,8 +49,7 @@ const Dashboard = ({
     currentProject ? getTasks(currentProject) : null
   )
   const [addingProject, setAddingProject] = useState<boolean>(false)
-  const [adding, setAdding] = useState<boolean>(true)
-  console.log(addingProject, setAdding)
+  const [adding, setAdding] = useState<boolean>(false)
 
   function sortByPriority(a: { priority: number }, b: { priority: number }) {
     return a.priority > b.priority ? -1 : 1
@@ -88,27 +81,6 @@ const Dashboard = ({
       : null
   }
 
-  async function addProject(e: FormEvent) {
-    e.preventDefault()
-    const addProject = fetch('/project/add', {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-    if ((await addProject).ok) {
-      addProject
-        .then((r) => r.json())
-        .then((data) => {
-          setAllProjects(data)
-        })
-    }
-
-    setAddingProject(false)
-  }
-
   async function deleteProject(project: projectsType[0], e: React.MouseEvent) {
     e.stopPropagation()
     const r = fetch('/project/delete', {
@@ -133,84 +105,15 @@ const Dashboard = ({
     }
   }
 
-  function handleChangeValues(e: React.ChangeEvent) {
-    ;(e.target as HTMLInputElement).name === 'priorityValue'
-      ? setData({
-          ...data,
-          [(e.target as HTMLInputElement).name]: parseInt((e.target as HTMLInputElement).value),
-        })
-      : setData({
-          ...data,
-          [(e.target as HTMLInputElement).name]: (e.target as HTMLInputElement).value,
-        })
-  }
-
   return (
     <Wrapper>
-      {adding && (
-        <DivModal>
-          <ModalComponent open={adding} setOpen={setAdding}>
-            <li className="adding" onClick={(e) => e.stopPropagation()}>
-              <form onSubmit={addProject}>
-                <label htmlFor="nameValue">
-                  Name :
-                  <input
-                    type="text"
-                    name="nameValue"
-                    id="nameValue"
-                    onChange={handleChangeValues}
-                    required
-                  />
-                </label>
-                <label htmlFor="descValue">
-                  Description :
-                  <input
-                    type="text"
-                    name="descValue"
-                    id="descValue"
-                    onChange={handleChangeValues}
-                    required
-                  />
-                </label>
-                <label htmlFor="startDateValue">
-                  Start date :
-                  <input
-                    type="date"
-                    name="startDateValue"
-                    id="startDateValue"
-                    onChange={handleChangeValues}
-                    required
-                  />
-                </label>
-                <label htmlFor="endDateValue">
-                  End date :
-                  <input
-                    type="date"
-                    name="endDateValue"
-                    id="endDateValue"
-                    onChange={handleChangeValues}
-                    required
-                  />
-                </label>
-                <label htmlFor="priorityValue">
-                  priority :{' '}
-                  <select
-                    name="priorityValue"
-                    id="priorityValue"
-                    onChange={handleChangeValues}
-                    required
-                  >
-                    <option value={0}>Low</option>
-                    <option value={1}>Mid</option>
-                    <option value={2}>Hight</option>
-                  </select>
-                </label>
-                <input type="submit" value="Add project" disabled={processing} />
-              </form>
-            </li>
+      {adding && addingProject ? (
+        <DivModal onClick={() => setAdding(false)}>
+          <ModalComponent open={adding} setOpen={setAdding} title={addingProject && 'Add project'}>
+            {addingProject && <AddProjectModal />}
           </ModalComponent>
         </DivModal>
-      )}
+      ) : null}
 
       <img src={bgImage} alt="" />
       <ProjectMenus ref={projectNavRef} className="display">
@@ -287,6 +190,7 @@ const Dashboard = ({
         <button
           onClick={(e) => {
             e.stopPropagation()
+            setAdding(true)
             setAddingProject(true)
             window.addEventListener('click', () => setAddingProject(false))
           }}
