@@ -55,9 +55,9 @@ const WrapperTasks = styled.section`
       overflow: hidden;
 
       &.todo {
-        background-color: rgba(27, 25, 77, 0.75);
+        background-color: hsla(242, 50%, 40%, 0.75);
         & > .statusOverlay {
-          background-color: hsl(242, 50%, 20%);
+          background-color: hsl(242, 50%, 40%);
         }
       }
       &.doing {

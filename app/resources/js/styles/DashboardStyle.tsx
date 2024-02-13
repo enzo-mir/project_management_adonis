@@ -83,7 +83,7 @@ const ProjectMenus = styled.nav`
         font-size: 0.75em;
 
         &.projectTodo {
-          background-color: hsl(242, 50%, 20%);
+          background-color: hsl(242, 50%, 40%);
         }
         &.projectDoing {
           background-color: #3389ef;
@@ -95,7 +95,7 @@ const ProjectMenus = styled.nav`
 
       &.activeProject {
         &:has(div.projectTodo) {
-          background-color: rgba(27, 25, 77, 0.7);
+          background-color: hsla(242, 50%, 40%, 0.7);
         }
         &:has(div.projectDoing) {
           background-color: rgba(51, 136, 239, 0.7);
