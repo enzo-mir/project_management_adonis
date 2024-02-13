@@ -154,7 +154,7 @@ const ProjectMenus = styled.nav`
   @media screen and (max-width: 650px) {
     position: absolute;
     padding: 1em;
-    z-index: 50;
+    z-index: 35;
     background-color: hsl(242, 51%, 30%);
     transition: all 0.5s ease-out;
     width: 75px;

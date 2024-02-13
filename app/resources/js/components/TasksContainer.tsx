@@ -39,7 +39,7 @@ const TasksContainer = ({
 
   useEffect(() => {
     setProgression(getProgression(tasks))
-  }, [allTasks])
+  }, [allTasks, currentProject])
 
   function sortByPriority(a: { priority: number }, b: { priority: number }) {
     return a.priority > b.priority ? -1 : 1
@@ -148,6 +148,7 @@ const TasksContainer = ({
       const progress = getProgression(
         actionChangeStatus(currentTask, statusValue, tasks) as TasksType
       )
+
       setProgression(progress)
 
       fetch('/project/status', {

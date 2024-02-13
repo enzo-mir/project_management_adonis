@@ -38,6 +38,7 @@ export const FormAddProject = styled.form`
 
   & > div {
     display: flex;
+    flex-wrap: wrap;
     gap: 1em;
     justify-content: start;
     align-items: center;
