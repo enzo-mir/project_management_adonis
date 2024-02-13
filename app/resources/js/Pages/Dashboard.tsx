@@ -25,8 +25,12 @@ const Dashboard = ({
   tasks: TasksType
 }) => {
   const projectNavRef = useRef<HTMLElement>(null)
+  const [allProjects, setAllProjects] = projectStore((state) => [
+    state.allProjects,
+    state.setAllProjects,
+  ])
 
-  console.log(projects)
+  console.log(errors, userData)
 
   const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
   const { data, setData, processing } = useForm({
@@ -38,15 +42,12 @@ const Dashboard = ({
   })
   useEffect(() => {
     setAllTasks(tasks)
+    setAllProjects(projects)
   }, [tasks])
 
   const [currentProject, setCurrentProject] = useState<projectsType[0]>(
     projects.sort(sortByPriority)[0]
   )
-  const [allProjects, setAllProjects] = projectStore((state) => [
-    state.allProjects,
-    state.setAllProjects,
-  ])
 
   const [currentTasks, setCurrentTasks] = useState<TasksType | null>(
     currentProject ? getTasks(currentProject) : null

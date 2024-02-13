@@ -7,8 +7,8 @@ import { TasksType } from 'App/types/adminDataTypes'
 export default class AdminsController {
   public async dashboard(ctx: HttpContextContract) {
     try {
-      const projects: Project[] = (await getProjectDatas(ctx))[0]
-      const tasks: TasksType[] = (await getTasks(ctx))[0]
+      const projects: Project[] = await getProjectDatas(ctx)
+      const tasks: TasksType[] = await getTasks(ctx)
 
       return ctx.inertia.render('Dashboard', {
         projects,
