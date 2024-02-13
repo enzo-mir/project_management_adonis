@@ -41,16 +41,17 @@ const Dashboard = ({
     state.errorMessage,
     state.setErrorMessage,
   ])
+  const [currentProject, setCurrentProject] = useState<projectsType[0]>(
+    projects.sort(sortByPriority)[0]
+  )
   useEffect(() => {
     setAllTasks(tasks)
     setAllProjects(projects)
+    setCurrentProject(projects.sort(sortByPriority)[0])
   }, [tasks, projects])
   useEffect(() => {
     setError(errors)
   }, [errors])
-  const [currentProject, setCurrentProject] = useState<projectsType[0]>(
-    projects.sort(sortByPriority)[0]
-  )
 
   const [modal, setModal] = useState<string>('')
 
@@ -140,69 +141,67 @@ const Dashboard = ({
         </button>
         <ul id="projectContainer">
           {allProjects?.length || projects
-            ? (allProjects?.length ? allProjects : projects)
-                .sort(sortByPriority)
-                .map((projects, index) => {
-                  const status =
-                    projects.status === 0 ? 'todo' : projects.status === 1 ? 'doing' : 'done'
-                  const priority =
-                    projects.priority === 0 ? 'low' : projects.priority === 1 ? 'mid' : 'high'
-                  return (
-                    <li
-                      key={projects.id}
-                      className={index === 0 ? 'activeProject' : ''}
-                      onClick={(e) => projectToDisplay(e.target, projects)}
+            ? allProjects.sort(sortByPriority).map((projects, index) => {
+                const status =
+                  projects.status === 0 ? 'todo' : projects.status === 1 ? 'doing' : 'done'
+                const priority =
+                  projects.priority === 0 ? 'low' : projects.priority === 1 ? 'mid' : 'high'
+                return (
+                  <li
+                    key={projects.id}
+                    className={index === 0 ? 'activeProject' : ''}
+                    onClick={(e) => projectToDisplay(e.target, projects)}
+                  >
+                    <h2
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                      }}
                     >
-                      <h2
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          projectToDisplay((e.target as HTMLElement).parentNode!, projects)
-                        }}
-                      >
-                        {projects.name}
-                      </h2>
-                      <DeleteBtn onClick={(e) => deleteProject(projects, e)}>x</DeleteBtn>
+                      {projects.name}
+                    </h2>
+                    <DeleteBtn onClick={(e) => deleteProject(projects, e)}>x</DeleteBtn>
+                    <p
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                      }}
+                    >
+                      {projects.description}
+                    </p>
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                      }}
+                      className={`project${status[0].toUpperCase() + status.substring(1)}`}
+                    >
                       <p
                         onClick={(e) => {
                           e.stopPropagation()
-                          projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                          projectToDisplay(
+                            (e.target as HTMLElement).parentNode?.parentNode!,
+                            projects
+                          )
                         }}
                       >
-                        {projects.description}
+                        {status}
                       </p>
-                      <div
+                      <p
                         onClick={(e) => {
                           e.stopPropagation()
-                          projectToDisplay((e.target as HTMLElement).parentNode!, projects)
+                          projectToDisplay(
+                            (e.target as HTMLElement).parentNode?.parentNode!,
+                            projects
+                          )
                         }}
-                        className={`project${status[0].toUpperCase() + status.substring(1)}`}
                       >
-                        <p
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            projectToDisplay(
-                              (e.target as HTMLElement).parentNode?.parentNode!,
-                              projects
-                            )
-                          }}
-                        >
-                          {status}
-                        </p>
-                        <p
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            projectToDisplay(
-                              (e.target as HTMLElement).parentNode?.parentNode!,
-                              projects
-                            )
-                          }}
-                        >
-                          priority : {priority}
-                        </p>
-                      </div>
-                    </li>
-                  )
-                })
+                        {'priority : ' + priority}
+                      </p>
+                    </div>
+                  </li>
+                )
+              })
             : null}
         </ul>
         <button
@@ -215,15 +214,7 @@ const Dashboard = ({
         </button>
       </ProjectMenus>
       <TasksContainer currentProject={currentProject} setAdding={setModal}>
-        {currentProject && (
-          <HeaderDashboard
-            projectTitle={currentProject.name}
-            projectDescription={currentProject.description}
-            startDate={currentProject.start_date}
-            endDate={currentProject.end_date}
-            setOpen={setModal}
-          />
-        )}
+        <HeaderDashboard currentProject={currentProject} setOpen={setModal} />
       </TasksContainer>
     </Wrapper>
   )

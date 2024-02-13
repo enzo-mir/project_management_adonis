@@ -59,7 +59,7 @@ const ProjectMenus = styled.nav`
     max-height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    transition: all 0.5s ease-out;
+    transition: width 0.5s ease-out;
 
     & > li {
       position: relative;
@@ -76,11 +76,15 @@ const ProjectMenus = styled.nav`
 
       & > *:not(div, button) {
         padding-inline-start: 10px;
-        width: 100%;
+        width: max-content;
       }
       & > div {
         padding: 0.5em 10px;
         font-size: 0.75em;
+
+        & > p {
+          width: max-content;
+        }
 
         &.projectTodo {
           background-color: hsl(242, 50%, 40%);
@@ -162,15 +166,12 @@ const ProjectMenus = styled.nav`
     &.display {
       width: 100%;
       & > ul#projectContainer {
-        width: 80vw;
+        width: 100%;
       }
     }
 
-    & > ul#projectContainer {
-      width: 0vw;
-      & > li {
-        width: 100%;
-      }
+    & > ul#projectContainer > li {
+      width: 100%;
     }
   }
 `
@@ -179,7 +180,7 @@ const DeleteBtn = styled.button`
   display: grid;
   position: absolute;
   place-items: center;
-  width: 10%;
+  width: clamp(20px, 5svw, 40px);
   aspect-ratio: 1 / 1;
   right: 0;
   top: 0;

@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/inertia-react'
 import styled from 'styled-components'
+import { ProjectType } from '../types/userdatatype'
 const HeaderWrapper = styled.header`
   display: flex;
   align-items: center;
@@ -59,30 +60,33 @@ const HeaderWrapper = styled.header`
       border-radius: 3px;
       color: white;
     }
+
+    @media screen and (max-width: 450px) {
+      flex-direction: column;
+      gap: 0.25em;
+    }
   }
 `
 
 const HeaderDashboard = ({
-  projectTitle,
-  projectDescription,
-  startDate,
-  endDate,
+  currentProject,
   setOpen,
 }: {
-  projectTitle: string
-  projectDescription: string
-  startDate: Date
-  endDate: Date
+  currentProject: ProjectType[0]
   setOpen(val: string): void
 }) => {
   return (
     <HeaderWrapper>
-      <span>
-        <p>Start date : {new Date(startDate).toLocaleDateString()}</p>
-        <p>End date : {new Date(endDate).toLocaleDateString()}</p>
-      </span>
-      <h1>{projectTitle}</h1>
-      <p>{projectDescription}</p>
+      {currentProject && (
+        <>
+          <span>
+            <p>Start date : {new Date(currentProject.start_date).toLocaleDateString()}</p>
+            <p>End date : {new Date(currentProject.end_date).toLocaleDateString()}</p>
+          </span>
+          <h1>{currentProject.name}</h1>
+          <p>{currentProject.description}</p>
+        </>
+      )}
       <div className="cta_button">
         <button
           onClick={() => {

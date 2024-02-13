@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
+import Hash from '@ioc:Adonis/Core/Hash'
 import { ProfileUpdateSchema } from 'App/schemas/ProfileUpdate.schema'
 import { z } from 'zod'
 
@@ -25,11 +26,12 @@ export default class ProfilesController {
           return ctx.response.redirect().back()
         }
       } else {
+        const hashedPassword = await Hash.make(profileData.password)
         if (ctx.auth.user!.email === profileData.email) {
           await User.query()
             .update({
               username: profileData.username,
-              password: profileData.password,
+              password: hashedPassword,
             })
             .where('id', ctx.auth.user!.id)
           return ctx.response.redirect().back()
@@ -38,7 +40,7 @@ export default class ProfilesController {
             .update({
               username: profileData.username,
               email: profileData.email,
-              password: profileData.password,
+              password: hashedPassword,
             })
             .where('id', ctx.auth.user!.id)
           return ctx.response.redirect().back()
@@ -51,7 +53,9 @@ export default class ProfilesController {
         errors:
           error instanceof z.ZodError
             ? JSON.parse(error.message)[0]?.message
-            : 'Error : profile update went wrong',
+            : error.code === 'ER_DUP_ENTRY'
+              ? 'Email already used'
+              : 'Error : profile update went wrong',
       })
       return ctx.response.redirect().back()
     }

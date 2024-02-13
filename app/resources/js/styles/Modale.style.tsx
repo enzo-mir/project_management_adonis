@@ -6,7 +6,7 @@ export const DivModal = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   z-index: 40;
 `
 export const ModalComponentWrapper = styled.dialog`
@@ -37,7 +37,6 @@ export const ModalComponentWrapper = styled.dialog`
     border-radius: 5px;
     color: white;
     aspect-ratio: 1 / 1;
-    font-size: larger;
   }
   & > button:focus-visible {
     background-color: hsla(241, 39%, 20%, 1);

@@ -20,7 +20,7 @@ export const FormModalContainer = styled.form`
     color: white;
     border-radius: 3px;
 
-    &:invalid {
+    &:focus:is(:invalid) {
       outline: 1px solid red;
     }
 
@@ -41,11 +41,10 @@ export const FormModalContainer = styled.form`
   }
 
   & > div {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1em;
-    justify-content: start;
-    align-items: center;
+    place-items: center;
     width: 100%;
   }
   & label {
