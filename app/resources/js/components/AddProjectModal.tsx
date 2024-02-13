@@ -1,8 +1,8 @@
 import { useForm } from '@inertiajs/inertia-react'
 import React, { FormEvent } from 'react'
-import { FormAddProject } from '../styles/FormAddProject.style'
+import { FormModalContainer } from '../styles/FormModal.style'
 
-const AddProjectModal = ({ setOpen }: { setOpen(val: boolean): void }) => {
+const AddProjectModal = ({ setOpen }: { setOpen(val: string): void }) => {
   const { data, setData, processing, post } = useForm({
     nameValue: '',
     descValue: '',
@@ -28,13 +28,13 @@ const AddProjectModal = ({ setOpen }: { setOpen(val: boolean): void }) => {
     post('/project/add', {
       data,
       onSuccess: () => {
-        setOpen(false)
+        setOpen('')
       },
     })
   }
 
   return (
-    <FormAddProject onSubmit={addProject}>
+    <FormModalContainer onSubmit={addProject}>
       <label htmlFor="nameValue">
         Name*
         <input type="text" name="nameValue" id="nameValue" onChange={handleChangeValues} required />
@@ -74,7 +74,7 @@ const AddProjectModal = ({ setOpen }: { setOpen(val: boolean): void }) => {
         </select>
       </label>
       <input type="submit" value="Add project" disabled={processing} />
-    </FormAddProject>
+    </FormModalContainer>
   )
 }
 

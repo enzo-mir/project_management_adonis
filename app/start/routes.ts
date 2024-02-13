@@ -6,6 +6,7 @@ Route.get('/register', 'RegistersController.index')
 Route.post('/register', 'RegistersController.register')
 Route.get('/login', 'LoginController.index')
 Route.post('/login', 'LoginController.login')
+Route.post('/profile/update', 'ProfilesController.update')
 Route.get('/logout', async (ctx) => {
   await ctx.auth.logout()
   return ctx.inertia.location('/login')

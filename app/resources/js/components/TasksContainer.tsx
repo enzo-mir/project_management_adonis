@@ -11,13 +11,11 @@ import { taskStore } from '../store/task.store'
 const TasksContainer = ({
   children,
   currentProject,
-  setAddingTasks,
   setAdding,
 }: {
   children: ReactNode
   currentProject: projectsType[0]
-  setAddingTasks(val: boolean): void
-  setAdding(val: boolean): void
+  setAdding(val: string): void
 }) => {
   const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
   const tasks = allTasks.filter((task) => task.project_id === currentProject.id)
@@ -245,8 +243,7 @@ const TasksContainer = ({
           <button
             onClick={(e) => {
               e.stopPropagation()
-              setAdding(true)
-              setAddingTasks(true)
+              setAdding('addTask')
             }}
           >
             <img src={createTaskIcon} alt="" />

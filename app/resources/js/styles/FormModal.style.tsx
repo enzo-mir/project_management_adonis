@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-export const FormAddProject = styled.form`
+export const FormModalContainer = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -19,6 +19,10 @@ export const FormAddProject = styled.form`
     padding: 1em;
     color: white;
     border-radius: 3px;
+
+    &:invalid {
+      outline: 1px solid red;
+    }
 
     &[type='date'] {
       padding-inline-end: 0.5em;

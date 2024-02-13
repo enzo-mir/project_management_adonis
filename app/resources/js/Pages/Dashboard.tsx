@@ -16,6 +16,7 @@ import ModalComponent from '../components/ModalComponent'
 import { DivModal } from '../styles/Modale.style'
 import AddProjectModal from '../components/AddProjectModal'
 import AddTaskModal from '../components/Add_task_modal'
+import ProfileModal from '../components/Profile_modal'
 const Dashboard = ({
   errors,
   projects,
@@ -33,23 +34,20 @@ const Dashboard = ({
     state.setAllProjects,
   ])
 
-  console.log(errors, userData)
+  console.log(errors)
 
   const setAllTasks = taskStore((state) => state.setAllTasks)
 
   useEffect(() => {
     setAllTasks(tasks)
     setAllProjects(projects)
-    console.log(tasks)
   }, [tasks, projects])
 
   const [currentProject, setCurrentProject] = useState<projectsType[0]>(
     projects.sort(sortByPriority)[0]
   )
 
-  const [addingProject, setAddingProject] = useState<boolean>(false)
-  const [addingTasks, setAddingTasks] = useState<boolean>(false)
-  const [adding, setAdding] = useState<boolean>(false)
+  const [modal, setModal] = useState<string>('')
 
   function sortByPriority(a: { priority: number }, b: { priority: number }) {
     return a.priority > b.priority ? -1 : 1
@@ -96,17 +94,25 @@ const Dashboard = ({
 
   return (
     <Wrapper>
-      {adding && (addingProject || addingTasks) ? (
-        <DivModal onClick={() => setAdding(false)}>
+      {modal ? (
+        <DivModal onClick={() => setModal('')}>
           <ModalComponent
-            open={adding}
-            setOpen={setAdding}
-            title={addingProject ? 'Add project' : 'Add task'}
+            open={modal}
+            setOpen={setModal}
+            title={
+              modal === 'addProject'
+                ? 'Add project'
+                : modal === 'addTask'
+                  ? 'Add task'
+                  : 'Profile settings'
+            }
           >
-            {addingProject ? (
-              <AddProjectModal setOpen={setAdding} />
+            {modal === 'addProject' ? (
+              <AddProjectModal setOpen={setModal} />
+            ) : modal === 'addTask' ? (
+              <AddTaskModal setOpen={setModal} projectId={currentProject.id} />
             ) : (
-              <AddTaskModal setOpen={setAdding} projectId={currentProject.id} />
+              <ProfileModal userData={userData} setOpen={setModal} />
             )}
           </ModalComponent>
         </DivModal>
@@ -187,25 +193,20 @@ const Dashboard = ({
         <button
           onClick={(e) => {
             e.stopPropagation()
-            setAdding(true)
-            setAddingProject(true)
-            window.addEventListener('click', () => setAddingProject(false))
+            setModal('addProject')
           }}
         >
           <img src={createProjectIcon} alt="" />
         </button>
       </ProjectMenus>
-      <TasksContainer
-        currentProject={currentProject}
-        setAdding={setAdding}
-        setAddingTasks={setAddingTasks}
-      >
+      <TasksContainer currentProject={currentProject} setAdding={setModal}>
         {currentProject && (
           <HeaderDashboard
             projectTitle={currentProject.name}
             projectDescription={currentProject.description}
             startDate={currentProject.start_date}
             endDate={currentProject.end_date}
+            setOpen={setModal}
           />
         )}
       </TasksContainer>

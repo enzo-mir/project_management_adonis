@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/inertia-react'
 import { ChangeEvent, FormEvent } from 'react'
-import { FormAddProject } from '../styles/FormAddProject.style'
+import { FormModalContainer } from '../styles/FormModal.style'
 import { TasksType } from 'App/types/adminDataTypes'
 import { TaskType } from '../types/userdatatype'
 import { projectStore } from '../store/project.store'
@@ -9,7 +9,7 @@ const AddTaskModal = ({
   setOpen,
   projectId,
 }: {
-  setOpen(val: boolean): void
+  setOpen(val: string): void
   projectId: number
 }) => {
   const setAllProjects = projectStore((state) => state.setAllProjects)
@@ -82,7 +82,7 @@ const AddTaskModal = ({
           .then((response) => response.json())
           .then((data) => setAllProjects(data.projects))
 
-        setOpen(false)
+        setOpen('')
       },
       onError: (err) => {
         console.log(err)
@@ -91,7 +91,7 @@ const AddTaskModal = ({
   }
 
   return (
-    <FormAddProject onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
+    <FormModalContainer onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
       <label htmlFor="name">
         Title
         <input type="text" name="name" id="name" onChange={handleChange} required />
@@ -109,7 +109,7 @@ const AddTaskModal = ({
         </select>
       </label>
       <input type="submit" value="Ajouter" disabled={processing} />
-    </FormAddProject>
+    </FormModalContainer>
   )
 }
 

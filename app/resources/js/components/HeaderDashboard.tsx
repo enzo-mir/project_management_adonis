@@ -28,16 +28,37 @@ const HeaderWrapper = styled.header`
     color: white;
   }
 
-  & > a {
+  & > div.cta_button {
     position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5em;
     right: 10px;
     top: 10px;
-    text-decoration: none;
-    font-size: 1em;
     padding: 0.5em;
-    border-radius: 3px;
-    background: hsl(242, 50%, 50%);
-    color: white;
+
+    & > button {
+      font-size: 1em;
+      padding: 0.5em;
+      border-radius: 3px;
+      background: hsl(242, 50%, 50%);
+      color: white;
+      border: none;
+      transition: all 0.2s ease-out;
+
+      &:hover {
+        cursor: pointer;
+        scale: 1.15;
+      }
+    }
+
+    & > a {
+      font-size: 1em;
+      padding: 0.5em;
+      border-radius: 3px;
+      color: white;
+    }
   }
 `
 
@@ -46,11 +67,13 @@ const HeaderDashboard = ({
   projectDescription,
   startDate,
   endDate,
+  setOpen,
 }: {
   projectTitle: string
   projectDescription: string
   startDate: Date
   endDate: Date
+  setOpen(val: string): void
 }) => {
   return (
     <HeaderWrapper>
@@ -60,7 +83,16 @@ const HeaderDashboard = ({
       </span>
       <h1>{projectTitle}</h1>
       <p>{projectDescription}</p>
-      <Link href="/logout">Log out</Link>
+      <div className="cta_button">
+        <button
+          onClick={() => {
+            setOpen('profileSettings')
+          }}
+        >
+          Profile
+        </button>
+        <Link href="/logout">Log out</Link>
+      </div>
     </HeaderWrapper>
   )
 }
