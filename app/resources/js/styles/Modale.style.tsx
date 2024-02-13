@@ -19,16 +19,29 @@ export const ModalComponentWrapper = styled.dialog`
   top: 50%;
   left: 50%;
   border: none !important;
-  border-radius: 10px;
+  border-radius: 5px;
   transform: translate(-50%, -50%);
-  padding: 1rem;
+  padding: 2rem;
   z-index: 50;
+  color: white;
+  background-color: hsl(241, 50%, 50%);
 
   & > button {
     position: absolute;
+    background-color: hsla(241, 39%, 20%, 0.5);
+    border: none;
     top: 5px;
     right: 5px;
-    width: 20px;
+    width: 30px;
+    border-radius: 5px;
+    color: white;
     aspect-ratio: 1 / 1;
+    font-size: larger;
+  }
+  & > button:focus-visible {
+    background-color: hsla(241, 39%, 20%, 1);
+  }
+  & > button:hover {
+    cursor: pointer;
   }
 `

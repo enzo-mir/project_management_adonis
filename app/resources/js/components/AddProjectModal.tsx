@@ -31,16 +31,16 @@ const AddProjectModal = () => {
   return (
     <FormAddProject onSubmit={addProject}>
       <label htmlFor="nameValue">
-        Name
+        Name*
         <input type="text" name="nameValue" id="nameValue" onChange={handleChangeValues} required />
       </label>
       <label htmlFor="descValue">
-        Description
+        Description*
         <input type="text" name="descValue" id="descValue" onChange={handleChangeValues} required />
       </label>
       <div>
         <label htmlFor="startDateValue">
-          Start date
+          Start date*
           <input
             type="date"
             name="startDateValue"
@@ -50,7 +50,7 @@ const AddProjectModal = () => {
           />
         </label>
         <label htmlFor="endDateValue">
-          End date
+          End date*
           <input
             type="date"
             name="endDateValue"

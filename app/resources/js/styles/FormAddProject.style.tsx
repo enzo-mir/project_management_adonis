@@ -7,8 +7,30 @@ export const FormAddProject = styled.form`
   align-items: center;
   padding-inline: 1em;
   gap: 1em;
-  & input {
-    padding: 0.5em 0.75em;
+
+  & input,
+  & select {
+    background-color: hsla(241, 39%, 20%, 0.5);
+    border: none;
+    border-radius: 5px;
+    padding: 1em 2em;
+    color: white;
+    border-radius: 3px;
+
+    &[type='date'] {
+      padding-inline-end: 0.5em;
+
+      &::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+      }
+      &::-webkit-calendar-picker-indicator:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  & option {
+    background-color: hsla(241, 39%, 20%, 1);
   }
 
   & > div {
@@ -29,6 +51,14 @@ export const FormAddProject = styled.form`
   }
 
   & input[type='submit'] {
+    padding: 0.75em 1.75em;
     grid-area: 4 / 1 / 5 / 3;
+    align-self: start;
+    transition: all 0.25s ease-out;
+
+    &:hover {
+      cursor: pointer;
+      scale: 1.15;
+    }
   }
 `
