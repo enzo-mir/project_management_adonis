@@ -17,13 +17,15 @@ import { DivModal } from '../styles/Modale.style'
 import AddProjectModal from '../components/AddProjectModal'
 import AddTaskModal from '../components/Add_task_modal'
 import ProfileModal from '../components/Profile_modal'
+import { erroreMessageStore } from '../store/error_message.store'
+import MessageComponent from '../components/MessageComponent'
 const Dashboard = ({
   errors,
   projects,
   tasks,
   userData,
 }: {
-  errors: { messages: string }
+  errors: string
   userData: userdataType
   projects: projectsType
   tasks: TasksType
@@ -34,15 +36,18 @@ const Dashboard = ({
     state.setAllProjects,
   ])
 
-  console.log(errors)
-
   const setAllTasks = taskStore((state) => state.setAllTasks)
-
+  const [error, setError] = erroreMessageStore((state) => [
+    state.errorMessage,
+    state.setErrorMessage,
+  ])
   useEffect(() => {
     setAllTasks(tasks)
     setAllProjects(projects)
   }, [tasks, projects])
-
+  useEffect(() => {
+    setError(errors)
+  }, [errors])
   const [currentProject, setCurrentProject] = useState<projectsType[0]>(
     projects.sort(sortByPriority)[0]
   )
@@ -92,8 +97,18 @@ const Dashboard = ({
     }
   }
 
+  function ErrorTimeout() {
+    useEffect(() => {
+      setTimeout(() => {
+        setError('')
+      }, 3000)
+    }, [])
+    return <MessageComponent message={error} open={error ? true : false} />
+  }
+
   return (
     <Wrapper>
+      {error ? <ErrorTimeout /> : null}
       {modal ? (
         <DivModal onClick={() => setModal('')}>
           <ModalComponent

@@ -2,6 +2,7 @@ import { useForm } from '@inertiajs/inertia-react'
 import { FormModalContainer } from '../styles/FormModal.style'
 import { userdataType } from '../types/userdatatype'
 import { FormEvent } from 'react'
+import { erroreMessageStore } from '../store/error_message.store'
 
 const ProfileModal = ({
   userData,
@@ -10,6 +11,7 @@ const ProfileModal = ({
   userData: userdataType
   setOpen(val: string): void
 }) => {
+  const setError = erroreMessageStore((state) => state.setErrorMessage)
   const { data, setData, post, processing } = useForm({
     username: userData.username,
     email: userData.email,
@@ -32,8 +34,11 @@ const ProfileModal = ({
     ) {
       post('/profile/update', {
         data,
-        onError: () => {},
+        onError: (err) => {
+          setError(err as unknown as string)
+        },
         onSuccess: () => {
+          setError('')
           setOpen('')
         },
       })
