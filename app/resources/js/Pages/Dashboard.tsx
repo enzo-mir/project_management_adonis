@@ -13,6 +13,8 @@ import createProjectIcon from '../images/createProjectIcon.svg'
 import { useForm } from '@inertiajs/inertia-react'
 import { projectStore } from '../store/project.store'
 import { taskStore } from '../store/task.store'
+import ModalComponent from '../components/ModalComponent'
+import { DivModal } from '../styles/Modale.style'
 const Dashboard = ({
   errors,
   projects,
@@ -53,6 +55,8 @@ const Dashboard = ({
     currentProject ? getTasks(currentProject) : null
   )
   const [addingProject, setAddingProject] = useState<boolean>(false)
+  const [adding, setAdding] = useState<boolean>(true)
+  console.log(addingProject, setAdding)
 
   function sortByPriority(a: { priority: number }, b: { priority: number }) {
     return a.priority > b.priority ? -1 : 1
@@ -143,13 +147,9 @@ const Dashboard = ({
 
   return (
     <Wrapper>
-      <img src={bgImage} alt="" />
-      <ProjectMenus ref={projectNavRef} className="display">
-        <button onClick={handleToggleProjectMenus}>
-          <img src={burgerIcon} alt="" />
-        </button>
-        <ul id="projectContainer">
-          {addingProject && (
+      {adding && (
+        <DivModal>
+          <ModalComponent open={adding} setOpen={setAdding}>
             <li className="adding" onClick={(e) => e.stopPropagation()}>
               <form onSubmit={addProject}>
                 <label htmlFor="nameValue">
@@ -208,7 +208,16 @@ const Dashboard = ({
                 <input type="submit" value="Add project" disabled={processing} />
               </form>
             </li>
-          )}
+          </ModalComponent>
+        </DivModal>
+      )}
+
+      <img src={bgImage} alt="" />
+      <ProjectMenus ref={projectNavRef} className="display">
+        <button onClick={handleToggleProjectMenus}>
+          <img src={burgerIcon} alt="" />
+        </button>
+        <ul id="projectContainer">
           {allProjects?.length || projects
             ? (allProjects?.length ? allProjects : projects)
                 .sort(sortByPriority)
