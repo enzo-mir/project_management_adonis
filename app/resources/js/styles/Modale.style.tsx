@@ -15,6 +15,7 @@ export const ModalComponentWrapper = styled.dialog`
   justify-content: center;
   align-items: center;
   position: absolute;
+  width: clamp(350px, 40svw, 900px);
   gap: 1em;
   top: 50%;
   left: 50%;

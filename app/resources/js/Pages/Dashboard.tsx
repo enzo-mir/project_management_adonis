@@ -15,6 +15,7 @@ import { taskStore } from '../store/task.store'
 import ModalComponent from '../components/ModalComponent'
 import { DivModal } from '../styles/Modale.style'
 import AddProjectModal from '../components/AddProjectModal'
+import AddTaskModal from '../components/Add_task_modal'
 const Dashboard = ({
   errors,
   projects,
@@ -34,21 +35,20 @@ const Dashboard = ({
 
   console.log(errors, userData)
 
-  const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
+  const setAllTasks = taskStore((state) => state.setAllTasks)
 
   useEffect(() => {
     setAllTasks(tasks)
     setAllProjects(projects)
-  }, [tasks])
+    console.log(tasks)
+  }, [tasks, projects])
 
   const [currentProject, setCurrentProject] = useState<projectsType[0]>(
     projects.sort(sortByPriority)[0]
   )
 
-  const [currentTasks, setCurrentTasks] = useState<TasksType | null>(
-    currentProject ? getTasks(currentProject) : null
-  )
   const [addingProject, setAddingProject] = useState<boolean>(false)
+  const [addingTasks, setAddingTasks] = useState<boolean>(false)
   const [adding, setAdding] = useState<boolean>(false)
 
   function sortByPriority(a: { priority: number }, b: { priority: number }) {
@@ -65,20 +65,9 @@ const Dashboard = ({
       ;(e as HTMLElement).classList.add('activeProject')
 
       setCurrentProject(project)
-
-      project && setCurrentTasks(getTasks(project)!)
     } else {
       setCurrentProject(projects.sort(sortByPriority)[0])
-      setCurrentTasks([])
     }
-  }
-
-  function getTasks(projects: projectsType[0] | null) {
-    return !!projects
-      ? (allTasks.length ? allTasks : tasks).filter((task) => {
-          return task.project_id === projects.id ? true : false
-        })
-      : null
   }
 
   async function deleteProject(project: projectsType[0], e: React.MouseEvent) {
@@ -107,10 +96,18 @@ const Dashboard = ({
 
   return (
     <Wrapper>
-      {adding && addingProject ? (
+      {adding && (addingProject || addingTasks) ? (
         <DivModal onClick={() => setAdding(false)}>
-          <ModalComponent open={adding} setOpen={setAdding} title={addingProject && 'Add project'}>
-            {addingProject && <AddProjectModal setOpen={setAdding} />}
+          <ModalComponent
+            open={adding}
+            setOpen={setAdding}
+            title={addingProject ? 'Add project' : 'Add task'}
+          >
+            {addingProject ? (
+              <AddProjectModal setOpen={setAdding} />
+            ) : (
+              <AddTaskModal setOpen={setAdding} projectId={currentProject.id} />
+            )}
           </ModalComponent>
         </DivModal>
       ) : null}
@@ -198,18 +195,20 @@ const Dashboard = ({
           <img src={createProjectIcon} alt="" />
         </button>
       </ProjectMenus>
-      {currentTasks && (
-        <TasksContainer tasks={currentTasks} currentProject={currentProject}>
-          {currentProject && (
-            <HeaderDashboard
-              projectTitle={currentProject.name}
-              projectDescription={currentProject.description}
-              startDate={currentProject.start_date}
-              endDate={currentProject.end_date}
-            />
-          )}
-        </TasksContainer>
-      )}
+      <TasksContainer
+        currentProject={currentProject}
+        setAdding={setAdding}
+        setAddingTasks={setAddingTasks}
+      >
+        {currentProject && (
+          <HeaderDashboard
+            projectTitle={currentProject.name}
+            projectDescription={currentProject.description}
+            startDate={currentProject.start_date}
+            endDate={currentProject.end_date}
+          />
+        )}
+      </TasksContainer>
     </Wrapper>
   )
 }

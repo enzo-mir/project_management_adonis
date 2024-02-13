@@ -5,6 +5,9 @@ export default class Task extends BaseModel {
   public id: number
 
   @column()
+  public user_id: string
+
+  @column()
   public project_id: number
 
   @column()

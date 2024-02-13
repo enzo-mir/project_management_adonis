@@ -1,31 +1,32 @@
 import { TasksType, projectsType } from 'App/types/adminDataTypes'
-import React, { ChangeEvent, FormEvent, ReactNode, useEffect, useState } from 'react'
+import { FormEvent, ReactNode, useEffect, useState } from 'react'
 import { projectStore } from '../store/project.store'
 // @ts-ignore: Unreachable code error
 
 import createTaskIcon from '../images/createProjectIcon.svg'
-import { useForm } from '@inertiajs/inertia-react'
 import { DeleteBtn } from '../styles/DashboardStyle'
-import { Wrapper, WrapperTasks } from '../styles/TasksStyle'
+import { WrapperTasks } from '../styles/TasksStyle'
 import { taskStore } from '../store/task.store'
 
 const TasksContainer = ({
-  tasks,
   children,
   currentProject,
+  setAddingTasks,
+  setAdding,
 }: {
-  tasks: TasksType
   children: ReactNode
   currentProject: projectsType[0]
+  setAddingTasks(val: boolean): void
+  setAdding(val: boolean): void
 }) => {
+  const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
+  const tasks = allTasks.filter((task) => task.project_id === currentProject.id)
+
   const [progression, setProgression] = useState<number>(0 || getProgression(tasks))
-  const [dynamicTasks, setDynamicTasks] = useState<TasksType>(tasks)
   const [allProjects, setAllProjects] = projectStore((state) => [
     state.allProjects,
     state.setAllProjects,
   ])
-  const [allTasks, setAllTasks] = taskStore((state) => [state.allTasks, state.setAllTasks])
-  const [addingTasks, setAddingTasks] = useState(false)
   useEffect(() => {
     setAllProjects(
       actionChangeStatus(
@@ -35,103 +36,13 @@ const TasksContainer = ({
       ) as projectsType
     )
   }, [progression])
+
   useEffect(() => {
-    setDynamicTasks(tasks.sort(sortByPriority))
     setProgression(getProgression(tasks))
-  }, [tasks])
+  }, [allTasks])
 
   function sortByPriority(a: { priority: number }, b: { priority: number }) {
     return a.priority > b.priority ? -1 : 1
-  }
-
-  function NewTask() {
-    const { data, setData } = useForm({
-      name: '',
-      description: '',
-      priority: 0,
-      project_id: currentProject.id,
-    })
-
-    function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-      setData({
-        ...data,
-        [e.target.name]: parseInt(e.target.value) || e.target.value,
-      })
-    }
-
-    async function handleSubmit(e: React.FormEvent) {
-      e.preventDefault()
-      const responseData = fetch('/task/add', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      const response = await responseData
-      if (response.ok) {
-        responseData
-          .then((r) => r.json())
-          .then((dataResponse: { id: number }) => {
-            const newTasksToSet: TasksType = [
-              ...dynamicTasks,
-              {
-                id: dataResponse.id,
-                project_id: currentProject.id,
-                name: data.name,
-                description: data.description,
-                status: 0,
-                priority: data.priority as 0 | 1 | 2,
-              },
-            ]
-            setDynamicTasks(newTasksToSet.sort(sortByPriority))
-            setAllTasks([
-              ...allTasks,
-              {
-                id: dataResponse.id,
-                project_id: currentProject.id,
-                name: data.name,
-                description: data.description,
-                status: 0,
-                priority: data.priority as 0 | 1 | 2,
-              },
-            ])
-
-            setProgression(
-              getProgression([
-                ...dynamicTasks,
-                {
-                  id: dataResponse.id,
-                  project_id: currentProject.id,
-                  name: data.name,
-                  description: data.description,
-                  status: 0,
-                  priority: data.priority as 0 | 1 | 2,
-                },
-              ])
-            )
-          })
-        setAddingTasks(false)
-      }
-    }
-    return (
-      <Wrapper onClick={(e) => e.stopPropagation()} onSubmit={handleSubmit}>
-        <label htmlFor="name">
-          Title : <input type="text" name="name" id="name" onChange={handleChange} required />
-        </label>
-        <label htmlFor="description">
-          Description :{' '}
-          <input type="text" name="description" id="description" onChange={handleChange} required />
-        </label>
-        <label htmlFor="priority">
-          Priority :{' '}
-          <select name="priority" id="priority" onChange={handleChange}>
-            <option value={0}>Low</option>
-            <option value={1}>Mid</option>
-            <option value={2}>Hight</option>
-          </select>
-        </label>
-        <input type="submit" value="Ajouter" />
-      </Wrapper>
-    )
   }
 
   function getProgression(tasks: TasksType) {
@@ -188,21 +99,42 @@ const TasksContainer = ({
     })
 
     if ((await deleteResponse).ok) {
-      const filterArray = allTasks.filter((task) => (task.id === task_id ? false : true))
-      setAllTasks(filterArray)
-      const filteredTasksToDisplay = filterArray
-        .filter((task) => (task.project_id === currentProject.id ? true : false))
-        .sort(sortByPriority)
+      deleteResponse
+        .then((response) => response.json())
+        .then((data: { tasks: TasksType }) => {
+          setAllTasks(data.tasks)
+          const currentTasks = data.tasks.filter((task) => task.project_id === currentProject.id)
 
-      setDynamicTasks(filteredTasksToDisplay)
-      setProgression(getProgression(filteredTasksToDisplay))
+          const progress = getProgression(currentTasks)
+          setProgression(progress)
+
+          fetch('/project/status', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              projectId: currentProject.id,
+              status: currentTasks.length
+                ? progress > 0 && progress < 100
+                  ? 1
+                  : progress === 100
+                    ? 2
+                    : 0
+                : 0,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => setAllProjects(data.projects))
+        })
     }
   }
 
   async function handleChangeStatus(e: FormEvent<HTMLInputElement>, currentTask: TasksType[0]) {
     let statusValue = parseInt((e.target as HTMLElement).dataset.value!) as 0 | 1 | 2
 
-    const changeStatusResponse = await fetch('/task/status', {
+    const changeStatusTasks = fetch('/task/status', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -210,11 +142,11 @@ const TasksContainer = ({
       },
       body: JSON.stringify({ taskId: currentTask.id, status: statusValue }),
     })
-    if (changeStatusResponse.ok) {
-      setDynamicTasks(actionChangeStatus(currentTask, statusValue, dynamicTasks) as TasksType)
+    if ((await changeStatusTasks).ok) {
+      changeStatusTasks.then((response) => response.json()).then((data) => setAllTasks(data.tasks))
 
       const progress = getProgression(
-        actionChangeStatus(currentTask, statusValue, dynamicTasks) as TasksType
+        actionChangeStatus(currentTask, statusValue, tasks) as TasksType
       )
       setProgression(progress)
 
@@ -229,6 +161,8 @@ const TasksContainer = ({
           status: progress > 0 && progress < 100 ? 1 : progress === 100 ? 2 : 0,
         }),
       })
+        .then((response) => response.json())
+        .then((data) => setAllProjects(data.projects))
     }
   }
 
@@ -253,64 +187,65 @@ const TasksContainer = ({
         </div>
       )}
       <ol id="tasksCont">
-        {dynamicTasks?.map((task, index) => {
-          const status = task.status === 0 ? 'todo' : task.status === 1 ? 'doing' : 'done'
-          const priority = task.priority === 0 ? 'low' : task.priority === 1 ? 'mid' : 'high'
-          return (
-            <li key={task.id} className={status}>
-              <DeleteBtn onClick={() => deleteTask(task.id)}>x</DeleteBtn>
-              <h2>{task.name}</h2>
-              <p>{task.description}</p>
-              <div className="inputStatus">
-                <label htmlFor={`task${task.project_id + index}`}>
-                  Todo
-                  <input
-                    type="radio"
-                    name={`task${task.project_id + index}`}
-                    id={`task${task.project_id + index}`}
-                    data-value={0}
-                    onChange={(e) => handleChangeStatus(e, task)}
-                    defaultChecked={task.status === 0 ? true : false}
-                  />
-                </label>
-                <label htmlFor={`task${task.project_id + index}`}>
-                  Doing
-                  <input
-                    type="radio"
-                    name={`task${task.project_id + index}`}
-                    id={`task${task.project_id + index}`}
-                    data-value={1}
-                    onChange={(e) => handleChangeStatus(e, task)}
-                    defaultChecked={task.status === 1 ? true : false}
-                  />
-                </label>
-                <label htmlFor={`task${task.project_id + index}`}>
-                  Done
-                  <input
-                    type="radio"
-                    name={`task${task.project_id + index}`}
-                    id={`task${task.project_id + index}`}
-                    data-value={2}
-                    onChange={(e) => handleChangeStatus(e, task)}
-                    defaultChecked={task.status === 2 ? true : false}
-                  />
-                </label>
-              </div>
-              <div className="statusOverlay">
-                <p>{status[0].toUpperCase() + status.substring(1)}</p>
-                <span>Priority : {priority}</span>
-              </div>
-            </li>
-          )
-        })}
-        {addingTasks && <NewTask />}
+        {tasks.length
+          ? tasks.sort(sortByPriority)?.map((task, index) => {
+              const status = task.status === 0 ? 'todo' : task.status === 1 ? 'doing' : 'done'
+              const priority = task.priority === 0 ? 'low' : task.priority === 1 ? 'mid' : 'high'
+              return (
+                <li key={task.id} className={status}>
+                  <DeleteBtn onClick={() => deleteTask(task.id)}>x</DeleteBtn>
+                  <h2>{task.name}</h2>
+                  <p>{task.description}</p>
+                  <div className="inputStatus">
+                    <label htmlFor={`task${task.project_id + index}`}>
+                      Todo
+                      <input
+                        type="radio"
+                        name={`task${task.project_id + index}`}
+                        id={`task${task.project_id + index}`}
+                        data-value={0}
+                        onChange={(e) => handleChangeStatus(e, task)}
+                        defaultChecked={task.status === 0 ? true : false}
+                      />
+                    </label>
+                    <label htmlFor={`task${task.project_id + index}`}>
+                      Doing
+                      <input
+                        type="radio"
+                        name={`task${task.project_id + index}`}
+                        id={`task${task.project_id + index}`}
+                        data-value={1}
+                        onChange={(e) => handleChangeStatus(e, task)}
+                        defaultChecked={task.status === 1 ? true : false}
+                      />
+                    </label>
+                    <label htmlFor={`task${task.project_id + index}`}>
+                      Done
+                      <input
+                        type="radio"
+                        name={`task${task.project_id + index}`}
+                        id={`task${task.project_id + index}`}
+                        data-value={2}
+                        onChange={(e) => handleChangeStatus(e, task)}
+                        defaultChecked={task.status === 2 ? true : false}
+                      />
+                    </label>
+                  </div>
+                  <div className="statusOverlay">
+                    <p>{status[0].toUpperCase() + status.substring(1)}</p>
+                    <span>Priority : {priority}</span>
+                  </div>
+                </li>
+              )
+            })
+          : null}
 
         {currentProject && (
           <button
             onClick={(e) => {
               e.stopPropagation()
+              setAdding(true)
               setAddingTasks(true)
-              window.addEventListener('click', () => setAddingTasks(false))
             }}
           >
             <img src={createTaskIcon} alt="" />

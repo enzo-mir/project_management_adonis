@@ -6,14 +6,17 @@ export const FormAddProject = styled.form`
   justify-content: center;
   align-items: center;
   padding-inline: 1em;
+  width: 100%;
   gap: 1em;
-
+  & > label > select {
+    padding: 1em;
+  }
   & input,
   & select {
     background-color: hsla(241, 39%, 20%, 0.5);
     border: none;
     border-radius: 5px;
-    padding: 1em 2em;
+    padding: 1em;
     color: white;
     border-radius: 3px;
 
@@ -35,14 +38,15 @@ export const FormAddProject = styled.form`
 
   & > div {
     display: flex;
-    gap: 0.5em;
-    justify-content: center;
+    gap: 1em;
+    justify-content: start;
     align-items: center;
+    width: 100%;
   }
   & label {
     display: flex;
     flex-direction: column;
-    gap: 0.2em;
+    gap: 0.5em;
     width: 100%;
 
     &:nth-child(5) {

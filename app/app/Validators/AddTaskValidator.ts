@@ -23,7 +23,12 @@ export default class AddTaskValidator {
    *     ])
    *    ```
    */
-  public schema = schema.create({})
+  public schema = schema.create({
+    name: schema.string(),
+    description: schema.string(),
+    priority: schema.number(),
+    project_id: schema.number(),
+  })
 
   /**
    * Custom messages for validation failures. You can make use of dot notation `(.)`

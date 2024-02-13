@@ -1,26 +1,26 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator'
 import Task from 'App/Models/Task'
+import AddTaskValidator from 'App/Validators/AddTaskValidator'
+import getTasks from 'App/functions/get_tasks'
 
 export default class TasksManagmentsController {
   public async add(ctx: HttpContextContract) {
-    const validationSchema = schema.create({
-      name: schema.string(),
-      description: schema.string(),
-      priority: schema.number(),
-      project_id: schema.number(),
-    })
     try {
-      const taskData = await ctx.request.validate({ schema: validationSchema })
-      const creationTask = await Task.create({
+      const taskData = await ctx.request.validate(AddTaskValidator)
+      await Task.create({
         name: taskData.name,
+        user_id: ctx.auth.user!.id,
         description: taskData.description,
         priority: taskData.priority as 0 | 1 | 2,
         project_id: taskData.project_id,
       })
-      return ctx.response.status(200).json({ id: creationTask.id })
+      return ctx.response.redirect().back()
     } catch (error) {
-      return ctx.inertia.location('/dashboard')
+      ctx.session.flash({
+        errors: error.message || 'Error : task creation failed',
+      })
+      return ctx.response.redirect().back()
     }
   }
   public async status(ctx: HttpContextContract) {
@@ -36,8 +36,11 @@ export default class TasksManagmentsController {
           status: taskData.status,
         })
         .where('id', taskData.taskId)
-      return ctx.response.status(200)
+
+      return ctx.response.status(200).json({ tasks: await getTasks(ctx) })
     } catch (error) {
+      console.log(error)
+
       return ctx.inertia.location('/dashboard')
     }
   }
@@ -46,7 +49,7 @@ export default class TasksManagmentsController {
     const id: number = await ctx.request.only(['id']).id
     try {
       await Task.query().delete().where('id', id)
-      ctx.inertia.redirectBack()
+      return ctx.response.status(200).json({ tasks: await getTasks(ctx) })
     } catch (error) {
       ctx.response.status(400)
     }
