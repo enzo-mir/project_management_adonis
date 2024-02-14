@@ -5,7 +5,7 @@ const resend = new Resend(Env.get('API_RESEND_KEY'))
 
 export default async function forgotPassword(email: string, id: string) {
   function generateHash(text: string) {
-    return jwt.sign({ text }, Env.get('JWT_SECRET'), { expiresIn: '1m' })
+    return jwt.sign({ text }, Env.get('JWT_SECRET'), { expiresIn: '1h' })
   }
 
   const hashedEmail = generateHash(email)

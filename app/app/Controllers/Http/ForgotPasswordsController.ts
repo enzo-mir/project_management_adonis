@@ -10,18 +10,15 @@ export default class ForgotPasswordsController {
     try {
       const verifyEmail = jwt.verify(email, Env.get('JWT_SECRET'))
       const verifyId = jwt.verify(id, Env.get('JWT_SECRET'))
-      
+
+      return ctx.inertia.render('ForgotPassword')
     } catch (error) {
       if (error instanceof JsonWebTokenError) {
-        ctx.session.flash({
-          errors: 'Token expired or invalid',
+        return ctx.inertia.render('Undefined', {
+          title: 'Error 500 : Token expired or invalid',
         })
-        return ctx.response.redirect().back()
       } else {
-        ctx.session.flash({
-          errors: 'Something went Wrong durring The token reset',
-        })
-        return ctx.response.redirect().back()
+        return ctx.inertia.render('Undefined')
       }
     }
   }

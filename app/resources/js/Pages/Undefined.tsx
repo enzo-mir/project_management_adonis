@@ -22,10 +22,10 @@ const Wrapper = styled.section`
   }
 `
 
-const Undefined = () => {
+const Undefined = ({ title }: { title: string | undefined }) => {
   return (
     <Wrapper>
-      <h1>Error 404 : Undefined path</h1>
+      <h1>{title || 'Error 404 : Undefined path'}</h1>
       <Link href="/">Go home</Link>
     </Wrapper>
   )

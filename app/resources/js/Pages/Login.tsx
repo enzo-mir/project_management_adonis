@@ -4,7 +4,7 @@ import { WrapperForms, ForgotPasswordButton } from '../styles/FormsWrapper'
 import { useState } from 'react'
 import ModalComponent from '../components/ModalComponent'
 import { DivModal } from '../styles/Modale.style'
-import ForgotPassword from '../components/ForgotPassword'
+import ForgotPassword from '../components/Forgot_password_modal'
 
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState<{ password?: string; email?: string }>({})
