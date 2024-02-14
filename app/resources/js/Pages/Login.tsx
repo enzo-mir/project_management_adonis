@@ -1,10 +1,14 @@
 import { Head, Link, useForm } from '@inertiajs/inertia-react'
 import Layout from './Layout'
-import { WrapperForms } from '../styles/FormsWrapper'
+import { WrapperForms, ForgotPasswordButton } from '../styles/FormsWrapper'
 import { useState } from 'react'
+import ModalComponent from '../components/ModalComponent'
+import { DivModal } from '../styles/Modale.style'
+import ForgotPassword from '../components/ForgotPassword'
 
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState<{ password?: string; email?: string }>({})
+  const [modale, setModal] = useState<string>('')
   const { data, setData, post, processing } = useForm({
     email: '',
     username: '',
@@ -29,6 +33,14 @@ const Login = () => {
   }
   return (
     <WrapperForms>
+      {modale ? (
+        <DivModal onClick={() => setModal('')}>
+          <ModalComponent open={modale} setOpen={setModal} title={'Forgot password'}>
+            <ForgotPassword setOpen={setModal} />
+          </ModalComponent>
+        </DivModal>
+      ) : null}
+
       <Head title="Project_managment - Register" />
       <h2>Login form --</h2>
       <form onSubmit={handlSubmitLogin}>
@@ -53,6 +65,9 @@ const Login = () => {
             required
           />
           {errorMessage?.password ? <p>{errorMessage.password}</p> : null}
+          <ForgotPasswordButton type="button" onClick={() => setModal('forgotPassword')}>
+            Forgot password ?
+          </ForgotPasswordButton>
         </label>
         <div className="cta">
           <button type="submit" disabled={processing}>

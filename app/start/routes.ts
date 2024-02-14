@@ -24,6 +24,8 @@ Route.group(() => {
 }).prefix('/task')
 
 Route.get('/dashboard', 'AdminsController.dashboard').middleware('auth')
+Route.post('/password', 'ForgotPasswordsController.sendEmail')
+Route.get('/:email/:id', 'ForgotPasswordsController.index')
 Route.any('/*', async ({ inertia }) => {
   return inertia.render('Undefined')
 })

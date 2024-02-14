@@ -1,6 +1,5 @@
 import styled from 'styled-components'
-
-export const WrapperForms = styled.article`
+const WrapperForms = styled.article`
   display: grid;
   place-items: center;
   gap: 2em;
@@ -17,7 +16,7 @@ export const WrapperForms = styled.article`
     display: flex;
     flex-direction: column;
     width: clamp(300px, 75%, 500px);
-    gap: 2em;
+    gap: 2.5em;
 
     & > label {
       display: flex;
@@ -60,3 +59,18 @@ export const WrapperForms = styled.article`
     }
   }
 `
+const ForgotPasswordButton = styled.button`
+  width: max-content;
+  padding: 0.5em;
+  border: none;
+  border-radius: 5px;
+  color: hsl(242, 50%, 50%);
+  background-color: white;
+  font-weight: bolder;
+
+  &:hover {
+    cursor: pointer;
+  }
+`
+
+export { WrapperForms, ForgotPasswordButton }
