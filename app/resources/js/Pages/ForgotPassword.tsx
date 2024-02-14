@@ -21,15 +21,15 @@ const MainWrapperForgotPassword = styled.main`
 `
 
 const ForgotPassword = () => {
-  const { post, data, setData, processing } = useForm({
+  const { get, data, setData, processing } = useForm({
     password: '',
     confirmPassword: '',
   })
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (data.password.length > 8) {
+    if (data.password.length >= 8) {
       if (data.password === data.confirmPassword) {
-        post('/password/reset', { data })
+        get(window.location.href, { data })
       }
     }
   }

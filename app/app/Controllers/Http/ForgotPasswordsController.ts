@@ -3,15 +3,22 @@ import forgotPassword from 'App/mailers/ForgotPassword'
 import User from 'App/Models/User'
 import jwt, { JsonWebTokenError } from 'jsonwebtoken'
 import Env from '@ioc:Adonis/Core/Env'
+import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class ForgotPasswordsController {
   public async index(ctx: HttpContextContract) {
     const { email, id } = ctx.params
-    try {
-      const verifyEmail = jwt.verify(email, Env.get('JWT_SECRET'))
-      const verifyId = jwt.verify(id, Env.get('JWT_SECRET'))
+    const { password, confirmPassword } = ctx.request.qs()
 
-      return ctx.inertia.render('ForgotPassword')
+    try {
+      jwt.verify(email, Env.get('JWT_SECRET'))
+      jwt.verify(id, Env.get('JWT_SECRET'))
+
+      if (password && confirmPassword) {
+        await this.resetPassword(ctx, email, id)
+      } else {
+        return ctx.inertia.render('ForgotPassword')
+      }
     } catch (error) {
       if (error instanceof JsonWebTokenError) {
         return ctx.inertia.render('Undefined', {
@@ -19,6 +26,47 @@ export default class ForgotPasswordsController {
         })
       } else {
         return ctx.inertia.render('Undefined')
+      }
+    }
+  }
+
+  public async resetPassword(ctx: HttpContextContract, email: string, id: string) {
+    const { password, confirmPassword } = ctx.request.qs()
+
+    try {
+      const emailverify = jwt.verify(email, Env.get('JWT_SECRET')) as jwt.JwtPayload & {
+        text: string
+      }
+      const idverify = jwt.verify(id, Env.get('JWT_SECRET')) as jwt.JwtPayload & {
+        text: string
+      }
+      if (password.length >= 8) {
+        if (password === confirmPassword) {
+          const passwordHashed = await Hash.make(password)
+          await User.query()
+            .update({
+              password: passwordHashed,
+            })
+            .whereRaw(`id = ${idverify.text} AND email = "${emailverify.text}"`)
+
+          return ctx.response.redirect().back()
+        }
+        throw new Error('Password and the confirmation password does not matchs')
+      }
+      throw new Error("Password's length must further than 8")
+    } catch (error) {
+      console.log(error)
+
+      if (error instanceof JsonWebTokenError) {
+        ctx.session.flash({
+          errors: 'Error 500 : Token expired or invalid',
+        })
+        return ctx.response.redirect().back()
+      } else {
+        ctx.session.flash({
+          errors: error.message,
+        })
+        return ctx.response.redirect().back()
       }
     }
   }
