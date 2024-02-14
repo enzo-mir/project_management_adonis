@@ -59,6 +59,7 @@
     "react-dom": "^18.2.0",
     "react-flip-move": "^3.0.5",
     "reflect-metadata": "^0.2.1",
+    "resend": "^3.2.0",
     "source-map-support": "^0.5.21",
     "styled-components": "^6.1.1",
     "ts-loader": "^9.0.0",
