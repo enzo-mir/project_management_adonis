@@ -1,7 +1,7 @@
 {
-  "assets/app.css": "http://localhost:8080/assets/app.css",
-  "assets/app.js": "http://localhost:8080/assets/app.js",
-  "assets/images/backgroundImage.png": "http://localhost:8080/assets/images/backgroundImage.557c3773.png",
-  "assets/images/burger.svg": "http://localhost:8080/assets/images/burger.fb21dacb.svg",
-  "assets/images/createProjectIcon.svg": "http://localhost:8080/assets/images/createProjectIcon.37efcbc8.svg"
+  "assets/app.css": "/assets/app.e1eede97.css",
+  "assets/app.js": "/assets/app.549d68fc.js",
+  "assets/images/backgroundImage.png": "/assets/images/backgroundImage.557c3773.png",
+  "assets/images/burger.svg": "/assets/images/burger.fb21dacb.svg",
+  "assets/images/createProjectIcon.svg": "/assets/images/createProjectIcon.37efcbc8.svg"
 }

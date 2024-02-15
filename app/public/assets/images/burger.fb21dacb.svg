@@ -1,0 +1,29 @@
+<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="34"
+            height="29"
+            viewBox="0 0 34 29"
+            fill="none"
+          >
+            <path
+              d="M1 1H33"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M1 14.2874H33"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M1 27.5749H33"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
