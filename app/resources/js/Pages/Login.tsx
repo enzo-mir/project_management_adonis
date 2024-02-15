@@ -64,7 +64,7 @@ const Login = () => {
             onChange={handleChangeValue}
             required
           />
-          {errorMessage?.password ? <p>{errorMessage.password}</p> : null}
+          {errorMessage?.password ? <p className="error_text">{errorMessage.password}</p> : null}
           <ForgotPasswordButton type="button" onClick={() => setModal('forgotPassword')}>
             Forgot password ?
           </ForgotPasswordButton>

@@ -8,17 +8,12 @@ import Hash from '@ioc:Adonis/Core/Hash'
 export default class ForgotPasswordsController {
   public async index(ctx: HttpContextContract) {
     const { email, id } = ctx.params
-    const { password, confirmPassword } = ctx.request.qs()
 
     try {
       jwt.verify(email, Env.get('JWT_SECRET'))
       jwt.verify(id, Env.get('JWT_SECRET'))
 
-      if (password && confirmPassword) {
-        await this.resetPassword(ctx, email, id)
-      } else {
-        return ctx.inertia.render('ForgotPassword')
-      }
+      return ctx.inertia.render('ForgotPassword')
     } catch (error) {
       if (error instanceof JsonWebTokenError) {
         return ctx.inertia.render('Undefined', {
@@ -30,8 +25,9 @@ export default class ForgotPasswordsController {
     }
   }
 
-  public async resetPassword(ctx: HttpContextContract, email: string, id: string) {
-    const { password, confirmPassword } = ctx.request.qs()
+  public async resetPassword(ctx: HttpContextContract) {
+    const { password, confirmPassword } = ctx.request.all()
+    const { email, id } = ctx.params
 
     try {
       const emailverify = jwt.verify(email, Env.get('JWT_SECRET')) as jwt.JwtPayload & {
@@ -47,9 +43,9 @@ export default class ForgotPasswordsController {
             .update({
               password: passwordHashed,
             })
-            .whereRaw(`id = ${idverify.text} AND email = "${emailverify.text}"`)
+            .whereRaw(`id = "${idverify.text}" AND email = "${emailverify.text}"`)
 
-          return ctx.response.redirect().back()
+          return ctx.response.redirect().toPath('/login')
         }
         throw new Error('Password and the confirmation password does not matchs')
       }
@@ -81,12 +77,13 @@ export default class ForgotPasswordsController {
       return ctx.response.redirect().back()
     }
 
-    const { data, error } = await forgotPassword(email, emailExist.id)
+    const { error } = await forgotPassword(email, emailExist.id)
     if (error) {
-      console.log(error)
+      ctx.session.flash({
+        errors: 'Error during the send of email, please verify your email',
+      })
+      return ctx.response.redirect().back()
     }
-
-    console.log(data)
 
     return ctx.response.redirect().back()
   }

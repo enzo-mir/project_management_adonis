@@ -7,7 +7,9 @@ const WrapperForms = styled.article`
   padding: 2em 1em;
   border-radius: 3px;
   background: hsl(242, 50%, 50%);
-
+  & .error_text {
+    color: #ff4e4e;
+  }
   & > h2 {
     text-align: left;
     width: clamp(300px, 75%, 500px);

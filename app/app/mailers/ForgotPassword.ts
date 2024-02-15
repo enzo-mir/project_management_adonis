@@ -14,11 +14,11 @@ export default async function forgotPassword(email: string, id: string) {
   const urlMaker = defaultUrl + hashedEmail + '/' + hashedId
 
   const { data, error } = await resend.emails.send({
-    from: 'Acme <onboarding@resend.dev>',
-    to: ['miraglioenzo93@gmail.com'],
-    subject: 'Forgot your password - Project managment',
+    from: Env.get('FROM_EMAIL'),
+    to: [`${email}`],
+    subject: 'Reset password - Project managment',
     html: `<p>
-    Please click on teh following link to change the password
+    Please click on the following link to change the password
     <a href="${urlMaker}">Forgot password</a>.
     </p>`,
   })

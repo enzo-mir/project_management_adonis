@@ -19,6 +19,7 @@ import AddTaskModal from '../components/Add_task_modal'
 import ProfileModal from '../components/Profile_modal'
 import { erroreMessageStore } from '../store/error_message.store'
 import MessageComponent from '../components/MessageComponent'
+import { AnimatePresence } from 'framer-motion'
 const Dashboard = ({
   errors,
   projects,
@@ -51,6 +52,9 @@ const Dashboard = ({
   }, [tasks, projects])
   useEffect(() => {
     setError(errors)
+    setTimeout(() => {
+      setError('')
+    }, 3000)
   }, [errors])
 
   const [modal, setModal] = useState<string>('')
@@ -98,18 +102,11 @@ const Dashboard = ({
     }
   }
 
-  function ErrorTimeout() {
-    useEffect(() => {
-      setTimeout(() => {
-        setError('')
-      }, 3000)
-    }, [])
-    return <MessageComponent message={error} open={error ? true : false} />
-  }
-
   return (
     <Wrapper>
-      {error ? <ErrorTimeout /> : null}
+      <AnimatePresence>
+        {error ? <MessageComponent message={error} open={error ? true : false} /> : null}
+      </AnimatePresence>
       {modal ? (
         <DivModal onClick={() => setModal('')}>
           <ModalComponent

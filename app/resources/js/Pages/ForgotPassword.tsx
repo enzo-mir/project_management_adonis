@@ -1,6 +1,8 @@
 import { useForm } from '@inertiajs/inertia-react'
-import { FormEvent } from 'react'
+import { AnimatePresence } from 'framer-motion'
+import { FormEvent, useEffect, useState } from 'react'
 import styled from 'styled-components'
+import MessageComponent from '../components/MessageComponent'
 import { FormModalContainer } from '../styles/FormModal.style'
 
 const MainWrapperForgotPassword = styled.main`
@@ -21,7 +23,15 @@ const MainWrapperForgotPassword = styled.main`
 `
 
 const ForgotPassword = () => {
-  const { get, data, setData, processing } = useForm({
+  const [validation, setValidation] = useState<string>('')
+
+  useEffect(() => {
+    setTimeout(() => {
+      validation ? setValidation('') : null
+    }, 3000)
+  }, [validation])
+
+  const { post, data, setData, processing } = useForm({
     password: '',
     confirmPassword: '',
   })
@@ -29,12 +39,26 @@ const ForgotPassword = () => {
     e.preventDefault()
     if (data.password.length >= 8) {
       if (data.password === data.confirmPassword) {
-        get(window.location.href, { data })
+        post(window.location.href, {
+          data,
+          onError: (msg) => {
+            setValidation(msg as unknown as string)
+          },
+        })
+      } else {
+        setValidation('Password and the confirmation password does not matchs')
       }
+    } else {
+      setValidation("Password's length must further than 8")
     }
   }
   return (
     <MainWrapperForgotPassword>
+      <AnimatePresence>
+        {validation ? (
+          <MessageComponent open={validation ? true : false} message={validation} />
+        ) : null}
+      </AnimatePresence>
       <section>
         <h1>Reset your password</h1>
         <FormModalContainer onSubmit={handleSubmit}>

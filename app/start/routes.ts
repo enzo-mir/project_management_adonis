@@ -26,6 +26,7 @@ Route.group(() => {
 Route.get('/dashboard', 'AdminsController.dashboard').middleware('auth')
 Route.post('/password', 'ForgotPasswordsController.sendEmail')
 Route.get('/:email/:id', 'ForgotPasswordsController.index')
+Route.post('/:email/:id', 'ForgotPasswordsController.resetPassword')
 Route.any('/*', async ({ inertia }) => {
   return inertia.render('Undefined')
 })
